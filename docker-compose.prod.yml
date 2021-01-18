@@ -1,0 +1,18 @@
+version: '3'
+services:
+  web:
+    volumes:
+      - ./.docker/nginx/conf.d/bible-ui.conf:/etc/nginx/conf.d/bible-ui.conf
+    depends_on:
+      - bible-ui
+
+  bible-ui:
+    # image: rkeplin/bible-react-ui:latest
+    stdin_open: true
+    build:
+      context: .
+    restart: always
+    ports:
+      - 8082:80
+    networks:
+      - net1

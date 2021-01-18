@@ -1,32 +1,9 @@
 import React from 'react';
+import TranslationSelector from './book/TranslationSelector';
 
 class App extends React.Component {
     constructor(props: Record<string, unknown>) {
         super(props);
-    }
-
-    componentDidMount() {
-        fetch('http://bible-go-api.rkeplin.local/v1/translations')
-            .then((res) => res.json())
-            .then(
-                (result) => {
-                    console.log(result);
-                },
-                (error) => {
-                    console.log(error);
-                },
-            );
-
-        fetch('http://bible-php-api.rkeplin.local/v1/translations')
-            .then((res) => res.json())
-            .then(
-                (result) => {
-                    console.log(result);
-                },
-                (error) => {
-                    console.log(error);
-                },
-            );
     }
 
     render(): JSX.Element {
@@ -59,21 +36,7 @@ class App extends React.Component {
                         </h2>
                     </div>
                     <div className="pull-right translation-widget">
-                        {/*<translation-selector></translation-selector>*/}
-                        <button
-                            type="button"
-                            className="btn btn-primary btn-sm dropdown-toggle"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                        >
-                            KJV
-                        </button>
-                        <div className="dropdown-menu">
-                            <a className="dropdown-item" href="">
-                                KJV
-                            </a>
-                        </div>
+                        <TranslationSelector></TranslationSelector>
 
                         <div style={{ display: 'inline-block' }}>
                             <a href="" className="btn btn-primary ml-2 btn-sm">

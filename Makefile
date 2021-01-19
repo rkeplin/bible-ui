@@ -3,6 +3,10 @@ dev:
 	@echo "============= Spin Up Dev Version ============="
 	docker-compose up
 
+.PHONY: pretty
+pretty:
+	yarn eslint ./src --ext .ts,.tsx --fix
+
 .PHONY: down
 down:
 	@echo "============= Taking Everything Down ============="

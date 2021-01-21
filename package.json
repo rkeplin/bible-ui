@@ -1,7 +1,6 @@
 {
   "name": "bible-ui",
   "version": "0.1.0",
-  "private": true,
   "license": "MIT",
   "dependencies": {
     "react": "^17.0.1",

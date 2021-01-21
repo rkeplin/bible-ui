@@ -1,11 +1,11 @@
 import React from 'react';
 
-class SearchInput extends React.Component<any, any> {
+class KeywordSearch extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
     }
 
-    render(): JSX.Element {
+    public render(): JSX.Element {
         return (
             <div className="search-widget">
                 <div className="row">
@@ -22,4 +22,4 @@ class SearchInput extends React.Component<any, any> {
     }
 }
 
-export default SearchInput;
+export default KeywordSearch;

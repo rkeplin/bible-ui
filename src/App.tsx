@@ -1,19 +1,35 @@
 import React from 'react';
 import TranslationSelector from './book/TranslationSelector';
 import BookSelector from './book/BookSelector';
-import SearchInput from './book/SearchInput';
+import KeywordSearch from './book/KeywordSearch';
+import UserMenu from './book/UserMenu';
 
-class App extends React.Component {
+interface IState {
+    isNavOpen: boolean;
+}
+
+class App extends React.Component<any, IState> {
     constructor(props: Record<string, unknown>) {
         super(props);
+
+        this.state = {
+            isNavOpen: true,
+        };
+    }
+
+    toggleNav() {
+        this.setState({
+            isNavOpen: !this.state.isNavOpen,
+        });
     }
 
     render(): JSX.Element {
         return (
             <div>
-                <div id="topnav" className="nav-open">
+                <div id="topnav" className={`${this.state.isNavOpen ? 'nav-open' : ''}`}>
                     <div id="toggler" className="pl-2 pull-left">
                         <svg
+                            onClick={() => this.toggleNav()}
                             className="toggle-leftnav-icon"
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 30 30"
@@ -40,44 +56,20 @@ class App extends React.Component {
                     <div className="pull-right translation-widget">
                         <TranslationSelector></TranslationSelector>
 
-                        <div style={{ display: 'inline-block' }}>
-                            <a href="" className="btn btn-primary ml-2 btn-sm">
-                                Log in
-                            </a>
-                        </div>
-
-                        {/*<div style={{ display: 'inline-block' }}>*/}
-                        {/*    <button*/}
-                        {/*        type="button"*/}
-                        {/*        className="btn btn-primary ml-2 btn-sm dropdown-toggle"*/}
-                        {/*        data-toggle="dropdown"*/}
-                        {/*        aria-haspopup="true"*/}
-                        {/*        aria-expanded="false"*/}
-                        {/*    >*/}
-                        {/*        My Account*/}
-                        {/*    </button>*/}
-                        {/*    <div className="dropdown-menu">*/}
-                        {/*        <a className="dropdown-item" href="">*/}
-                        {/*            Manage Lists*/}
-                        {/*        </a>*/}
-                        {/*        <a className="dropdown-item" href="">*/}
-                        {/*            Logout*/}
-                        {/*        </a>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
+                        <UserMenu></UserMenu>
                     </div>
                 </div>
 
-                <div id="left-nav" className="nav-open">
+                <div id="left-nav" className={`${this.state.isNavOpen ? 'nav-open' : ''}`}>
                     <div className="p-4">
                         <h4 className="mb-3">Keyword Search</h4>
-                        <SearchInput></SearchInput>
+                        <KeywordSearch></KeywordSearch>
 
                         <h4 className="mt-4 mb-3">Jump To Book</h4>
                         <BookSelector></BookSelector>
                     </div>
                 </div>
-                <div id="main" className="pl-5 pr-5 nav-open">
+                <div id="main" className={`pl-5 pr-5 ${this.state.isNavOpen ? 'nav-open' : ''}`}>
                     <div id="content">
                         <div>
                             <div className="row">

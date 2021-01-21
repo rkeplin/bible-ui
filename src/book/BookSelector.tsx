@@ -1,4 +1,5 @@
 import React from 'react';
+import Config from '../Config';
 
 interface IState {
     selectedBook: number;
@@ -37,17 +38,43 @@ class BookSelector extends React.Component<any, IState> {
         };
     }
 
-    componentDidMount() {
+    private handleKeyDown(event: KeyboardEvent) {
+        // TODO: Only do this when the left nav is open, and the user is on the book page
+
+        if (this.state.isLoadingBooks || this.state.isLoadingChapters) {
+            return;
+        }
+
+        switch (event.key) {
+            case 'ArrowLeft':
+                if (!this.state.disablePrevBtn) {
+                    this.previous();
+                }
+                break;
+            case 'ArrowRight':
+                if (!this.state.disableNextBtn) {
+                    this.next();
+                }
+                break;
+        }
+    }
+
+    public componentWillUnmount() {
+        document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+    }
+
+    public componentDidMount() {
+        document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+
         this.setState({
             isLoadingBooks: true,
             isLoadingChapters: true,
         });
 
-        fetch('http://bible-go-api.rkeplin.local/v1/books')
+        fetch(`${Config.API}/books`)
             .then((res) => res.json())
             .then(
                 (result) => {
-                    console.log(result);
                     this.setState({
                         books: result,
                     });
@@ -63,12 +90,11 @@ class BookSelector extends React.Component<any, IState> {
             .then(() => this.getChapters(1));
     }
 
-    getChapters(bookId: number): void {
-        fetch(`http://bible-go-api.rkeplin.local/v1/books/${bookId}/chapters`)
+    private getChapters(bookId: number) {
+        return fetch(`${Config.API}/books/${bookId}/chapters`)
             .then((res) => res.json())
             .then(
                 (result) => {
-                    console.log(result);
                     this.setState({
                         isLoadingBooks: false,
                         isLoadingChapters: false,
@@ -87,31 +113,83 @@ class BookSelector extends React.Component<any, IState> {
             );
     }
 
-    onChangeBook = (event: React.FormEvent<HTMLSelectElement>) => {
+    private onChangeBook = (event: React.FormEvent<HTMLSelectElement>) => {
         const newBook = parseInt(event.currentTarget.value);
 
+        this.changeBook(newBook, 1);
+    };
+
+    private changeBook(newBook: number, newChapter: number) {
         this.setState({
             isLoadingBooks: true,
             isLoadingChapters: true,
-            selectedChapter: 1,
+            selectedChapter: newChapter,
             selectedBook: newBook,
-            disablePrevBtn: newBook === 1,
         });
 
-        this.getChapters(newBook);
-    };
+        this.getChapters(newBook).then(() => {
+            this.setState({
+                disablePrevBtn: this.disablePrev(newChapter),
+                disableNextBtn: this.disableNext(newChapter),
+            });
+        });
+    }
 
-    onChangeChapter = (event: React.FormEvent<HTMLSelectElement>) => {
+    private disablePrev(chapter: number): boolean {
+        return this.state.selectedBook === 1 && chapter === 1;
+    }
+
+    private disableNext(chapter: number): boolean {
+        return this.state.selectedBook === 66 && chapter === 22;
+    }
+
+    private onChangeChapter = (event: React.FormEvent<HTMLSelectElement>) => {
         const newChapter = parseInt(event.currentTarget.value);
 
         this.setState({
             selectedChapter: newChapter,
-            disablePrevBtn: this.state.selectedBook === 1 && newChapter === 1,
-            disableNextBtn: this.state.selectedBook === 66 && newChapter === 22,
+            disablePrevBtn: this.disablePrev(newChapter),
+            disableNextBtn: this.disableNext(newChapter),
         });
     };
 
-    render(): JSX.Element {
+    private next() {
+        const newChapter = this.state.selectedChapter + 1;
+
+        if (newChapter > this.state.chapters.length) {
+            this.changeBook(this.state.selectedBook + 1, 1);
+
+            return;
+        }
+
+        this.setState({
+            selectedChapter: newChapter,
+            disablePrevBtn: this.disablePrev(newChapter),
+            disableNextBtn: this.disableNext(newChapter),
+        });
+    }
+
+    private previous() {
+        const newChapter = this.state.selectedChapter - 1;
+
+        if (newChapter < 1) {
+            const newBook = this.state.selectedBook - 1;
+
+            this.getChapters(newBook).then(() => {
+                this.changeBook(newBook, this.state.chapters.length);
+            });
+
+            return;
+        }
+
+        this.setState({
+            selectedChapter: newChapter,
+            disablePrevBtn: this.disablePrev(newChapter),
+            disableNextBtn: this.disableNext(newChapter),
+        });
+    }
+
+    public render(): JSX.Element {
         const oldTestBooks = this.state.books.map((book: IBook) => {
             if (book.testament !== 'OT') {
                 return;
@@ -172,7 +250,7 @@ class BookSelector extends React.Component<any, IState> {
                     <div className="col-6 pr-1 mt-3">
                         <button
                             disabled={this.state.isLoadingBooks || this.state.disablePrevBtn}
-                            ng-click="vm.onPreviousClick()"
+                            onClick={() => this.previous()}
                             className="btn btn-primary btn-block"
                         >
                             Previous
@@ -181,7 +259,7 @@ class BookSelector extends React.Component<any, IState> {
                     <div className="col-6 pl-1 mt-3">
                         <button
                             disabled={this.state.isLoadingBooks || this.state.disableNextBtn}
-                            ng-click="vm.onNextClick()"
+                            onClick={() => this.next()}
                             className="btn btn-primary btn-block"
                         >
                             Next

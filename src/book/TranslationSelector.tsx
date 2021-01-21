@@ -1,4 +1,5 @@
 import React from 'react';
+import Config from '../Config';
 
 interface IState {
     isLoading: boolean;
@@ -27,12 +28,12 @@ class TranslationSelector extends React.Component<any, IState> {
         };
     }
 
-    componentDidMount() {
+    public componentDidMount() {
         this.setState({
             isLoading: true,
         });
 
-        fetch('http://bible-go-api.rkeplin.local/v1/translations')
+        fetch(`${Config.API}/translations`)
             .then((res) => res.json())
             .then(
                 (result) => {
@@ -52,7 +53,7 @@ class TranslationSelector extends React.Component<any, IState> {
             );
     }
 
-    update(e: React.MouseEvent, selectedTranslation: ITranslation): void {
+    private update(e: React.MouseEvent, selectedTranslation: ITranslation): void {
         e.preventDefault();
 
         this.setState({
@@ -60,7 +61,7 @@ class TranslationSelector extends React.Component<any, IState> {
         });
     }
 
-    render(): JSX.Element {
+    public render(): JSX.Element {
         return (
             <div style={{ display: 'inline-block' }}>
                 <button

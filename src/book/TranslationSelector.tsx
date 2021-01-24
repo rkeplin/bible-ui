@@ -1,5 +1,10 @@
 import React from 'react';
 import Config from '../Config';
+import ITranslation from './ITranslation';
+
+interface IProps {
+    onChange: (translation: ITranslation) => void;
+}
 
 interface IState {
     isLoading: boolean;
@@ -7,20 +12,14 @@ interface IState {
     translations: [];
 }
 
-interface ITranslation {
-    abbreviation: string;
-    id: number;
-    version: string;
-}
-
-class TranslationSelector extends React.Component<any, IState> {
+class TranslationSelector extends React.Component<IProps, IState> {
     constructor(props: any) {
         super(props);
 
         this.state = {
             selected: {
-                abbreviation: 'KJV',
                 id: 4,
+                abbreviation: 'KJV',
                 version: 'King James Version',
             },
             isLoading: true,
@@ -59,6 +58,8 @@ class TranslationSelector extends React.Component<any, IState> {
         this.setState({
             selected: selectedTranslation,
         });
+
+        this.props.onChange(selectedTranslation);
     }
 
     public render(): JSX.Element {

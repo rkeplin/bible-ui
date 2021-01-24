@@ -14,7 +14,7 @@ interface IState {
 }
 
 interface IProps {
-    onChange: (book: IBook, chapterId: number) => unknown;
+    onChange: (book: IBook, chapterId: number) => void;
 }
 
 interface IChapter {

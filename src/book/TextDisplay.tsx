@@ -1,6 +1,8 @@
 import React from 'react';
 import Config from '../Config';
 import VerseDisplay from './VerseDisplay';
+import IBook from './IBook';
+import ITranslation from './ITranslation';
 
 interface IVerse {
     book: IBook;
@@ -11,13 +13,8 @@ interface IVerse {
     highlight: boolean;
 }
 
-interface IBook {
-    id: number;
-    name: string;
-    testament: string;
-}
-
 interface IProps {
+    translation: ITranslation;
     bookId: number;
     chapterId: number;
 }
@@ -44,7 +41,11 @@ class TextDisplay extends React.Component<IProps, IState> {
     }
 
     private load() {
-        fetch(`${Config.API}/books/${this.props.bookId}/chapters/${this.props.chapterId}`)
+        fetch(
+            `${Config.API}/books/${this.props.bookId}/chapters/${
+                this.props.chapterId
+            }?translation=${this.props.translation.abbreviation.toLowerCase()}`,
+        )
             .then((res) => res.json())
             .then(
                 (result) => {
@@ -83,6 +84,10 @@ class TextDisplay extends React.Component<IProps, IState> {
         }
 
         if (prevProps.bookId !== this.props.bookId) {
+            update = true;
+        }
+
+        if (prevProps.translation.id !== this.props.translation.id) {
             update = true;
         }
 

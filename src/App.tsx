@@ -2,7 +2,8 @@ import React from 'react';
 import TranslationSelector from './book/TranslationSelector';
 import BookSelector from './book/BookSelector';
 import KeywordSearch from './book/KeywordSearch';
-import UserMenu from './book/UserMenu';
+import UserMenu from './user/UserMenu';
+import TextDisplay from './book/TextDisplay';
 
 interface IState {
     isNavOpen: boolean;
@@ -54,44 +55,23 @@ class App extends React.Component<any, IState> {
                         </h2>
                     </div>
                     <div className="pull-right translation-widget">
-                        <TranslationSelector></TranslationSelector>
-
-                        <UserMenu></UserMenu>
+                        <TranslationSelector />
+                        <UserMenu />
                     </div>
                 </div>
 
                 <div id="left-nav" className={`${this.state.isNavOpen ? 'nav-open' : ''}`}>
                     <div className="p-4">
                         <h4 className="mb-3">Keyword Search</h4>
-                        <KeywordSearch></KeywordSearch>
+                        <KeywordSearch />
 
                         <h4 className="mt-4 mb-3">Jump To Book</h4>
-                        <BookSelector></BookSelector>
+                        <BookSelector />
                     </div>
                 </div>
                 <div id="main" className={`pl-5 pr-5 ${this.state.isNavOpen ? 'nav-open' : ''}`}>
                     <div id="content">
-                        <div>
-                            <div className="row">
-                                <div className="col-md-6">
-                                    <p>
-                                        <a title="View Cross References" href="">
-                                            <b>1:1</b>
-                                        </a>
-                                        &nbsp;Something something something...
-                                    </p>
-                                </div>
-                                <div className="col-md-6">
-                                    <p>
-                                        <a title="View Cross References" href="">
-                                            <b>1:1</b>
-                                        </a>
-                                        &nbsp;Something something something...
-                                    </p>
-                                </div>
-                            </div>
-                            {/*<cross-reference-modal></cross-reference-modal>*/}
-                        </div>
+                        <TextDisplay />
                     </div>
                 </div>
             </div>

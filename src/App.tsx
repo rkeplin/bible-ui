@@ -4,8 +4,11 @@ import BookSelector from './book/BookSelector';
 import KeywordSearch from './book/KeywordSearch';
 import UserMenu from './user/UserMenu';
 import TextDisplay from './book/TextDisplay';
+import IBook from './book/IBook';
 
 interface IState {
+    book: IBook;
+    chapterId: number;
     isNavOpen: boolean;
 }
 
@@ -14,6 +17,12 @@ class App extends React.Component<any, IState> {
         super(props);
 
         this.state = {
+            book: {
+                id: 1,
+                testament: 'OT',
+                name: 'Genesis',
+            },
+            chapterId: 1,
             isNavOpen: true,
         };
     }
@@ -21,6 +30,13 @@ class App extends React.Component<any, IState> {
     toggleNav() {
         this.setState({
             isNavOpen: !this.state.isNavOpen,
+        });
+    }
+
+    onChangeBook(book: IBook, chapterId: number) {
+        this.setState({
+            book: book,
+            chapterId: chapterId,
         });
     }
 
@@ -50,8 +66,11 @@ class App extends React.Component<any, IState> {
                     </div>
                     <div className="ml-3 pull-left title">
                         <h2>
-                            <b>Genesis</b>
-                            <span className="hide-xs"> - Old Testament</span>
+                            <b>{this.state.book.name}</b>
+                            <span className="hide-xs">
+                                {' '}
+                                - {`${this.state.book.testament == 'OT' ? 'Old' : 'New'} Testament`}
+                            </span>
                         </h2>
                     </div>
                     <div className="pull-right translation-widget">
@@ -66,12 +85,12 @@ class App extends React.Component<any, IState> {
                         <KeywordSearch />
 
                         <h4 className="mt-4 mb-3">Jump To Book</h4>
-                        <BookSelector />
+                        <BookSelector onChange={(book, chapterId) => this.onChangeBook(book, chapterId)} />
                     </div>
                 </div>
                 <div id="main" className={`pl-5 pr-5 ${this.state.isNavOpen ? 'nav-open' : ''}`}>
                     <div id="content">
-                        <TextDisplay />
+                        <TextDisplay bookId={this.state.book.id} chapterId={this.state.chapterId} />
                     </div>
                 </div>
             </div>

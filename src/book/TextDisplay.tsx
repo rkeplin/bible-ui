@@ -17,14 +17,19 @@ interface IBook {
     testament: string;
 }
 
+interface IProps {
+    bookId: number;
+    chapterId: number;
+}
+
 interface IState {
     versesLeft: IVerse[];
     versesRight: IVerse[];
     book: IBook;
 }
 
-class TextDisplay extends React.Component<any, IState> {
-    constructor(props: any) {
+class TextDisplay extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
 
         this.state = {
@@ -38,8 +43,8 @@ class TextDisplay extends React.Component<any, IState> {
         };
     }
 
-    public componentDidMount() {
-        fetch(`${Config.API}/books/1/chapters/1`)
+    private load() {
+        fetch(`${Config.API}/books/${this.props.bookId}/chapters/${this.props.chapterId}`)
             .then((res) => res.json())
             .then(
                 (result) => {
@@ -68,6 +73,26 @@ class TextDisplay extends React.Component<any, IState> {
                     console.warn(error);
                 },
             );
+    }
+
+    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any) {
+        let update = false;
+
+        if (prevProps.chapterId !== this.props.chapterId) {
+            update = true;
+        }
+
+        if (prevProps.bookId !== this.props.bookId) {
+            update = true;
+        }
+
+        if (update) {
+            this.load();
+        }
+    }
+
+    public componentDidMount() {
+        this.load();
     }
 
     public render(): JSX.Element {

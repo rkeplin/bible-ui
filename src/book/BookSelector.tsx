@@ -1,10 +1,11 @@
 import React from 'react';
 import Config from '../Config';
+import IBook from './IBook';
 
 interface IState {
     selectedBook: number;
     isLoadingBooks: boolean;
-    books: [];
+    books: IBook[];
     selectedChapter: number;
     isLoadingChapters: boolean;
     chapters: [];
@@ -12,17 +13,15 @@ interface IState {
     disableNextBtn: boolean;
 }
 
-interface IBook {
-    id: number;
-    testament: string;
-    name: string;
+interface IProps {
+    onChange: (book: IBook, chapterId: number) => unknown;
 }
 
 interface IChapter {
     id: number;
 }
 
-class BookSelector extends React.Component<any, IState> {
+class BookSelector extends React.Component<IProps, IState> {
     constructor(props: any) {
         super(props);
 
@@ -132,6 +131,8 @@ class BookSelector extends React.Component<any, IState> {
                 disablePrevBtn: this.disablePrev(newChapter),
                 disableNextBtn: this.disableNext(newChapter),
             });
+
+            this.emit(newBook, newChapter);
         });
     }
 
@@ -151,13 +152,19 @@ class BookSelector extends React.Component<any, IState> {
             disablePrevBtn: this.disablePrev(newChapter),
             disableNextBtn: this.disableNext(newChapter),
         });
+
+        this.emit(this.state.selectedBook, newChapter);
     };
 
     private next() {
         const newChapter = this.state.selectedChapter + 1;
 
         if (newChapter > this.state.chapters.length) {
-            this.changeBook(this.state.selectedBook + 1, 1);
+            const newBook = this.state.selectedBook + 1;
+
+            this.changeBook(newBook, 1);
+
+            this.emit(newBook, 1);
 
             return;
         }
@@ -167,6 +174,17 @@ class BookSelector extends React.Component<any, IState> {
             disablePrevBtn: this.disablePrev(newChapter),
             disableNextBtn: this.disableNext(newChapter),
         });
+
+        this.emit(this.state.selectedBook, newChapter);
+    }
+
+    private emit(bookId: number, chapterId: number) {
+        for (let i = 0; i < this.state.books.length; i++) {
+            if (bookId === this.state.books[i].id) {
+                this.props.onChange(this.state.books[i], chapterId);
+                break;
+            }
+        }
     }
 
     private previous() {
@@ -177,6 +195,8 @@ class BookSelector extends React.Component<any, IState> {
 
             this.getChapters(newBook).then(() => {
                 this.changeBook(newBook, this.state.chapters.length);
+
+                this.emit(newBook, this.state.chapters.length);
             });
 
             return;
@@ -187,6 +207,8 @@ class BookSelector extends React.Component<any, IState> {
             disablePrevBtn: this.disablePrev(newChapter),
             disableNextBtn: this.disableNext(newChapter),
         });
+
+        this.emit(this.state.selectedBook, newChapter);
     }
 
     public render(): JSX.Element {

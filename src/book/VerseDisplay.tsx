@@ -16,6 +16,7 @@ interface IBook {
 }
 
 interface IProps {
+    onDisplayCrossRefs: (verse: IVerse) => void;
     verse: IVerse;
 }
 
@@ -28,10 +29,14 @@ class VerseDisplay extends React.Component<IProps, any> {
         };
     }
 
+    onDisplayCrossRefs() {
+        this.props.onDisplayCrossRefs(this.props.verse);
+    }
+
     public render(): JSX.Element {
         return (
             <p key={this.props.verse.verseId} className={`${this.props.verse.highlight ? 'lightyellow' : ''}`}>
-                <a title="View Cross References" href="#">
+                <a title="View Cross References" href="#" onClick={() => this.onDisplayCrossRefs()}>
                     <b>
                         {this.props.verse.chapterId}:{this.props.verse.verseId}
                     </b>

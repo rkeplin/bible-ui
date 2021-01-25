@@ -12,6 +12,7 @@ interface IState {
     book: IBook;
     chapterId: number;
     isNavOpen: boolean;
+    tmpIsNavOpen: boolean;
 }
 
 class App extends React.Component<any, IState> {
@@ -31,12 +32,14 @@ class App extends React.Component<any, IState> {
             },
             chapterId: 1,
             isNavOpen: true,
+            tmpIsNavOpen: true,
         };
     }
 
     toggleNav() {
         this.setState({
             isNavOpen: !this.state.isNavOpen,
+            tmpIsNavOpen: !this.state.isNavOpen,
         });
     }
 
@@ -50,6 +53,20 @@ class App extends React.Component<any, IState> {
         this.setState({
             book: book,
             chapterId: chapterId,
+        });
+    }
+
+    toggleCrossRefModal(open: boolean) {
+        if (open) {
+            this.setState({
+                isNavOpen: false,
+            });
+
+            return;
+        }
+
+        this.setState({
+            isNavOpen: this.state.tmpIsNavOpen,
         });
     }
 
@@ -111,6 +128,7 @@ class App extends React.Component<any, IState> {
                             translation={this.state.translation}
                             bookId={this.state.book.id}
                             chapterId={this.state.chapterId}
+                            toggleCrossRefModal={(open) => this.toggleCrossRefModal(open)}
                         />
                     </div>
                 </div>

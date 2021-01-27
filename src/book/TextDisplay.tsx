@@ -146,6 +146,7 @@ class TextDisplay extends React.Component<IProps, IState> {
                     open={this.state.displayCrossRefs}
                     side={this.state.crossRefSide}
                     verse={this.state.selectedVerse}
+                    translation={this.props.translation}
                     toggleModal={(open) => this.toggleCrossRefModal(open)}
                 />
             </div>

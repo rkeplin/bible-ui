@@ -38,7 +38,7 @@ class BookSelector extends React.Component<IProps, IState> {
     }
 
     private handleKeyDown(event: KeyboardEvent) {
-        // TODO: Only do this when the left nav is open, and the user is on the book page
+        // TODO: Only do this when the user is on the book page
 
         if (this.state.isLoadingBooks || this.state.isLoadingChapters) {
             return;

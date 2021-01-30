@@ -14,6 +14,8 @@ interface IState {
 }
 
 interface IProps {
+    selectedBook: number;
+    selectedChapter: number;
     onChange: (book: IBook, chapterId: number) => void;
 }
 
@@ -26,14 +28,14 @@ class BookSelector extends React.Component<IProps, IState> {
         super(props);
 
         this.state = {
-            selectedBook: 1,
+            selectedBook: this.props.selectedBook,
             isLoadingBooks: true,
             books: [],
-            selectedChapter: 1,
+            selectedChapter: this.props.selectedChapter,
             isLoadingChapters: true,
             chapters: [],
             disablePrevBtn: true,
-            disableNextBtn: false,
+            disableNextBtn: true,
         };
     }
 
@@ -66,6 +68,8 @@ class BookSelector extends React.Component<IProps, IState> {
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
 
         this.setState({
+            disablePrevBtn: this.disablePrev(this.props.selectedChapter),
+            disableNextBtn: this.disableNext(this.props.selectedChapter),
             isLoadingBooks: true,
             isLoadingChapters: true,
         });
@@ -86,7 +90,7 @@ class BookSelector extends React.Component<IProps, IState> {
                     });
                 },
             )
-            .then(() => this.getChapters(1));
+            .then(() => this.getChapters(this.state.selectedBook));
     }
 
     private getChapters(bookId: number) {

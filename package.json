@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "license": "MIT",
   "dependencies": {
+    "@types/react-router-dom": "^5.1.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-router-dom": "^5.2.0",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
     "start": "eslint ./src --ext .ts,.tsx --fix && HOST=bible-ui.rkeplin.local PORT=80 react-scripts start",
     "build": "eslint ./src --ext .ts,.tsx --fix && react-scripts build",
-    "test":  "eslint ./src --ext .ts,.tsx --fix && react-scripts test"
+    "test": "eslint ./src --ext .ts,.tsx --fix && react-scripts test"
   },
   "eslintConfig": {
     "extends": [

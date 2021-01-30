@@ -3,6 +3,7 @@ import Config from '../Config';
 import ITranslation from './ITranslation';
 
 interface IProps {
+    selectedTranslation: ITranslation;
     onChange: (translation: ITranslation) => void;
 }
 
@@ -17,11 +18,7 @@ class TranslationSelector extends React.Component<IProps, IState> {
         super(props);
 
         this.state = {
-            selected: {
-                id: 4,
-                abbreviation: 'KJV',
-                version: 'King James Version',
-            },
+            selected: this.props.selectedTranslation,
             isLoading: true,
             translations: [],
         };

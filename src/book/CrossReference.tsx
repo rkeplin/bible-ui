@@ -2,6 +2,7 @@ import React from 'react';
 import IVerse from './IVerse';
 import Config from '../Config';
 import ITranslation from './ITranslation';
+import BookService from './BookService';
 
 interface IProps {
     open: boolean;
@@ -52,18 +53,14 @@ class CrossReference extends React.Component<IProps, IState> {
             relatedVerses: [],
         });
 
-        fetch(
-            `${Config.API}/verse/${
-                this.props.verse?.id
-            }/relations?translation=${this.props.translation?.abbreviation.toLowerCase()}`,
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                this.setState({
-                    isLoading: false,
-                    relatedVerses: result,
-                });
+        const service = new BookService();
+
+        service.getCrossReferences(this.props.verse?.id, this.props.translation?.abbreviation).then((result) => {
+            this.setState({
+                isLoading: false,
+                relatedVerses: result,
             });
+        });
 
         if (this.props.side == 'R') {
             this.setState({

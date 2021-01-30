@@ -1,6 +1,6 @@
 import React from 'react';
-import Config from '../Config';
 import ITranslation from './ITranslation';
+import TranslationService from './TranslationService';
 
 interface IProps {
     selectedTranslation: ITranslation;
@@ -10,7 +10,7 @@ interface IProps {
 interface IState {
     isLoading: boolean;
     selected: ITranslation;
-    translations: [];
+    translations: ITranslation[];
 }
 
 class TranslationSelector extends React.Component<IProps, IState> {
@@ -29,24 +29,24 @@ class TranslationSelector extends React.Component<IProps, IState> {
             isLoading: true,
         });
 
-        fetch(`${Config.API}/translations`)
-            .then((res) => res.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        isLoading: false,
-                        translations: result,
-                    });
-                },
-                (error) => {
-                    console.warn(error);
+        const service = new TranslationService();
 
-                    this.setState({
-                        isLoading: false,
-                        translations: [],
-                    });
-                },
-            );
+        service.getAll().then(
+            (result) => {
+                this.setState({
+                    isLoading: false,
+                    translations: result,
+                });
+            },
+            (error) => {
+                console.warn(error);
+
+                this.setState({
+                    isLoading: false,
+                    translations: [],
+                });
+            },
+        );
     }
 
     private update(e: React.MouseEvent, selectedTranslation: ITranslation): void {
@@ -78,7 +78,7 @@ class TranslationSelector extends React.Component<IProps, IState> {
                                 key={index}
                                 href=""
                                 className={`dropdown-item ${
-                                    this.state.selected.id === value.id ? 'bg-brown text-white' : ''
+                                    this.state.selected.abbreviation === value.abbreviation ? 'bg-brown text-white' : ''
                                 }`}
                                 onClick={(e) => this.update(e, value)}
                             >

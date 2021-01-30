@@ -1,6 +1,7 @@
 import React from 'react';
-import Config from '../Config';
 import IBook from './IBook';
+import IChapter from './IChapter';
+import BookService from './BookService';
 
 interface IState {
     selectedBook: number;
@@ -8,7 +9,7 @@ interface IState {
     books: IBook[];
     selectedChapter: number;
     isLoadingChapters: boolean;
-    chapters: [];
+    chapters: IChapter[];
     disablePrevBtn: boolean;
     disableNextBtn: boolean;
 }
@@ -17,10 +18,6 @@ interface IProps {
     selectedBook: number;
     selectedChapter: number;
     onChange: (book: IBook, chapterId: number) => void;
-}
-
-interface IChapter {
-    id: number;
 }
 
 class BookSelector extends React.Component<IProps, IState> {
@@ -74,8 +71,10 @@ class BookSelector extends React.Component<IProps, IState> {
             isLoadingChapters: true,
         });
 
-        fetch(`${Config.API}/books`)
-            .then((res) => res.json())
+        const bookService = new BookService();
+
+        bookService
+            .getAll()
             .then(
                 (result) => {
                     this.setState({
@@ -94,26 +93,26 @@ class BookSelector extends React.Component<IProps, IState> {
     }
 
     private getChapters(bookId: number) {
-        return fetch(`${Config.API}/books/${bookId}/chapters`)
-            .then((res) => res.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        isLoadingBooks: false,
-                        isLoadingChapters: false,
-                        chapters: result,
-                    });
-                },
-                (error) => {
-                    console.warn(error);
+        const service = new BookService();
 
-                    this.setState({
-                        isLoadingBooks: false,
-                        isLoadingChapters: false,
-                        chapters: [],
-                    });
-                },
-            );
+        return service.getChapters(bookId).then(
+            (result) => {
+                this.setState({
+                    isLoadingBooks: false,
+                    isLoadingChapters: false,
+                    chapters: result,
+                });
+            },
+            (error) => {
+                console.warn(error);
+
+                this.setState({
+                    isLoadingBooks: false,
+                    isLoadingChapters: false,
+                    chapters: [],
+                });
+            },
+        );
     }
 
     private onChangeBook = (event: React.FormEvent<HTMLSelectElement>) => {

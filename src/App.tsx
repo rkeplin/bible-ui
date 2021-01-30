@@ -7,8 +7,13 @@ import TextDisplay from './book/TextDisplay';
 import IBook from './book/IBook';
 import ITranslation from './book/ITranslation';
 import { Switch, Route, Link, Redirect, withRouter, RouteComponentProps } from 'react-router-dom';
+import URLParser from './book/URLParser';
+import BookService from './book/BookService';
+import TranslationService from './book/TranslationService';
 
 interface IState {
+    title: string;
+    subTitle: string;
     translation: ITranslation;
     book: IBook;
     chapterId: number;
@@ -19,51 +24,77 @@ interface IState {
 class App extends React.Component<RouteComponentProps, IState> {
     protected history: any;
 
+    protected unlisten: any;
+
+    protected bookService: BookService;
+
+    protected translationService: TranslationService;
+
     constructor(props: RouteComponentProps) {
         super(props);
 
+        this.bookService = new BookService();
+        this.translationService = new TranslationService();
+
         this.history = this.props.history;
 
-        // TODO: Encapsulate stuff
-
-        const regex = /\/book\/([a-z]{3,4})\/([\d]{1,3})\/([\d]{1,3})/;
-        const matches = this.props.location.pathname.match(regex);
-
-        const translation: ITranslation = {
-            id: 4,
-            abbreviation: 'KJV',
-            version: 'King James Version',
-        };
-
-        const book: IBook = {
-            id: 1,
-            testament: 'OT',
-            name: 'Genesis',
-        };
-
-        let chapter = 1;
-
-        if (matches !== null && matches.length >= 4) {
-            // TODO: Pull from API
-            translation.id = 1;
-            translation.abbreviation = matches[1].toUpperCase();
-            translation.version = '';
-
-            // TODO: Pull from API
-            book.id = parseInt(matches[2]);
-            book.testament = 'OT';
-            book.name = 'Genesis';
-
-            chapter = parseInt(matches[3]);
-        }
+        const parser = new URLParser(this.props.location.pathname);
 
         this.state = {
-            translation: translation,
-            book: book,
-            chapterId: chapter,
+            title: 'Loading',
+            subTitle: '...',
+            translation: {
+                id: 0,
+                abbreviation: parser.getTranslation(),
+                version: '',
+            },
+            book: {
+                id: parser.getBookId(),
+                name: '',
+                testament: '',
+            },
+            chapterId: parser.getChapterId(),
             isNavOpen: true,
             tmpIsNavOpen: true,
         };
+
+        this.init(this.props.location.pathname);
+    }
+
+    init(pathname: string) {
+        if (pathname.startsWith('/book')) {
+            // Skip if we aren't on the book page and the nav is closed
+            const parser = new URLParser(pathname);
+
+            let book: IBook;
+            let translation: ITranslation;
+
+            this.bookService
+                .get(parser.getBookId())
+                .then((result) => {
+                    book = result;
+                })
+                .then(() => this.translationService.get(parser.getTranslation()))
+                .then((result) => {
+                    translation = result;
+                })
+                .then(() => {
+                    this.setState({
+                        translation: translation,
+                        title: book.name,
+                        subTitle: book.testament == 'OT' ? ' - Old Testament' : ' - New Testament',
+                        book: book,
+                        chapterId: parser.getChapterId(),
+                    });
+                });
+        }
+
+        if (pathname == '/search') {
+            this.setState({
+                title: 'Search Results',
+                subTitle: '50',
+            });
+        }
     }
 
     toggleNav() {
@@ -74,20 +105,33 @@ class App extends React.Component<RouteComponentProps, IState> {
     }
 
     onChangeTranslation(translation: ITranslation) {
-        this.setState({
-            translation: translation,
-        });
+        const parser = new URLParser(this.props.location.pathname);
+
+        if (!parser.isBookURL()) {
+            return;
+        }
 
         this.history.push(
             '/book/' + translation.abbreviation.toLowerCase() + '/' + this.state.book.id + '/' + this.state.chapterId,
         );
     }
 
-    onChangeBook(book: IBook, chapterId: number) {
-        this.setState({
-            book: book,
-            chapterId: chapterId,
+    componentDidMount() {
+        this.unlisten = this.props.history.listen((location) => {
+            this.init(location.pathname);
         });
+    }
+
+    componentWillUnmount() {
+        this.unlisten();
+    }
+
+    onChangeBook(book: IBook, chapterId: number) {
+        const parser = new URLParser(this.props.location.pathname);
+
+        if (!parser.isBookURL() && !this.state.isNavOpen) {
+            return;
+        }
 
         this.history.push(
             '/book/' + this.state.translation.abbreviation.toLowerCase() + '/' + book.id + '/' + chapterId,
@@ -134,11 +178,8 @@ class App extends React.Component<RouteComponentProps, IState> {
                     </div>
                     <div className="ml-3 pull-left title">
                         <h2>
-                            <b>{this.state.book.name}</b>
-                            <span className="hide-xs">
-                                {' '}
-                                - {`${this.state.book.testament == 'OT' ? 'Old' : 'New'} Testament`}
-                            </span>
+                            <b>{this.state.title}</b>
+                            <span className="hide-xs">&nbsp;{this.state.subTitle}</span>
                         </h2>
                     </div>
                     <div className="pull-right translation-widget">

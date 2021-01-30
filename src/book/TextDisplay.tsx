@@ -5,6 +5,7 @@ import IBook from './IBook';
 import ITranslation from './ITranslation';
 import IVerse from './IVerse';
 import CrossReference from './CrossReference';
+import BookService from './BookService';
 
 interface IProps {
     translation: ITranslation;
@@ -39,39 +40,35 @@ class TextDisplay extends React.Component<IProps, IState> {
     }
 
     private load() {
-        fetch(
-            `${Config.API}/books/${this.props.bookId}/chapters/${
-                this.props.chapterId
-            }?translation=${this.props.translation.abbreviation.toLowerCase()}`,
-        )
-            .then((res) => res.json())
-            .then(
-                (result) => {
-                    const versesLeft: IVerse[] = [],
-                        versesRight: IVerse[] = [];
+        const service = new BookService();
 
-                    for (let i = 0; i < result.length; i++) {
-                        result[i].highlight = false;
+        service.getText(this.props.bookId, this.props.chapterId, this.props.translation.abbreviation).then(
+            (result) => {
+                const versesLeft: IVerse[] = [],
+                    versesRight: IVerse[] = [];
 
-                        if (i < result.length / 2) {
-                            versesLeft.push(result[i]);
+                for (let i = 0; i < result.length; i++) {
+                    result[i].highlight = false;
 
-                            continue;
-                        }
+                    if (i < result.length / 2) {
+                        versesLeft.push(result[i]);
 
-                        versesRight.push(result[i]);
+                        continue;
                     }
 
-                    this.setState({
-                        versesLeft: versesLeft,
-                        versesRight: versesRight,
-                        book: result[0].book,
-                    });
-                },
-                (error) => {
-                    console.warn(error);
-                },
-            );
+                    versesRight.push(result[i]);
+                }
+
+                this.setState({
+                    versesLeft: versesLeft,
+                    versesRight: versesRight,
+                    book: result[0].book,
+                });
+            },
+            (error) => {
+                console.warn(error);
+            },
+        );
     }
 
     public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any) {

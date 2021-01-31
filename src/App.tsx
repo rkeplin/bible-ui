@@ -10,6 +10,12 @@ import { Switch, Route, Link, Redirect, withRouter, RouteComponentProps } from '
 import URLParser from './book/URLParser';
 import BookService from './book/BookService';
 import TranslationService from './book/TranslationService';
+import SearchResults from './search/SearchResults';
+
+interface ISearch {
+    isLoading: boolean;
+    search: string;
+}
 
 interface IState {
     title: string;
@@ -19,6 +25,7 @@ interface IState {
     chapterId: number;
     isNavOpen: boolean;
     tmpIsNavOpen: boolean;
+    search: ISearch;
 }
 
 class App extends React.Component<RouteComponentProps, IState> {
@@ -53,15 +60,17 @@ class App extends React.Component<RouteComponentProps, IState> {
                 name: '',
                 testament: '',
             },
+            search: {
+                isLoading: true,
+                search: '',
+            },
             chapterId: parser.getChapterId(),
             isNavOpen: true,
             tmpIsNavOpen: true,
         };
-
-        this.init(this.props.location.pathname);
     }
 
-    init(pathname: string) {
+    init(pathname: string, search: string) {
         if (pathname.startsWith('/book')) {
             // Skip if we aren't on the book page and the nav is closed
             const parser = new URLParser(pathname);
@@ -89,10 +98,12 @@ class App extends React.Component<RouteComponentProps, IState> {
                 });
         }
 
-        if (pathname == '/search') {
+        if (pathname.startsWith('/search')) {
             this.setState({
-                title: 'Search Results',
-                subTitle: '50',
+                search: {
+                    search: search.substring(7, search.length),
+                    isLoading: true,
+                },
             });
         }
     }
@@ -117,8 +128,10 @@ class App extends React.Component<RouteComponentProps, IState> {
     }
 
     componentDidMount() {
+        this.init(this.props.location.pathname, this.props.location.search);
+
         this.unlisten = this.props.history.listen((location) => {
-            this.init(location.pathname);
+            this.init(location.pathname, location.search);
         });
     }
 
@@ -136,6 +149,19 @@ class App extends React.Component<RouteComponentProps, IState> {
         this.history.push(
             '/book/' + this.state.translation.abbreviation.toLowerCase() + '/' + book.id + '/' + chapterId,
         );
+    }
+
+    onSearch(search: string) {
+        this.history.push('/search?query=' + search);
+    }
+
+    onChangeTitle(title: string, subTitle: string) {
+        this.setState({
+            title: title,
+            subTitle: subTitle,
+        });
+
+        return;
     }
 
     toggleCrossRefModal(open: boolean) {
@@ -194,7 +220,10 @@ class App extends React.Component<RouteComponentProps, IState> {
                 <div id="left-nav" className={`${this.state.isNavOpen ? 'nav-open' : ''}`}>
                     <div className="p-4">
                         <h4 className="mb-3">Keyword Search</h4>
-                        <KeywordSearch />
+                        <KeywordSearch
+                            search={this.state.search.search}
+                            onSearch={(search: string) => this.onSearch(search)}
+                        />
 
                         <h4 className="mt-4 mb-3">Jump To Book</h4>
                         <BookSelector
@@ -206,10 +235,6 @@ class App extends React.Component<RouteComponentProps, IState> {
                 </div>
                 <div id="main" className={`pl-5 pr-5 ${this.state.isNavOpen ? 'nav-open' : ''}`}>
                     <div id="content">
-                        <Link to="/search">Search</Link>
-
-                        <Link to="/">Home</Link>
-
                         <Switch>
                             <Route path="/book/:translation/:bookId/:chapterId">
                                 <TextDisplay
@@ -221,7 +246,12 @@ class App extends React.Component<RouteComponentProps, IState> {
                             </Route>
 
                             <Route path="/search">
-                                <div>Search results here...</div>
+                                <SearchResults
+                                    changeTitle={(title, subTitle) => this.onChangeTitle(title, subTitle)}
+                                    isLoading={this.state.search.isLoading}
+                                    search={this.state.search.search}
+                                    translationAbbr={this.state.translation.abbreviation}
+                                />
                             </Route>
 
                             <Redirect to="/book/kjv/1/1"></Redirect>

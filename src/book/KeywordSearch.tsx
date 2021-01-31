@@ -1,8 +1,47 @@
 import React from 'react';
 
-class KeywordSearch extends React.Component<any, any> {
-    constructor(props: any) {
+interface IState {
+    search: string;
+}
+
+interface IProps {
+    search: string;
+    onSearch: (search: string) => void;
+}
+
+class KeywordSearch extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
+
+        this.state = {
+            search: this.props.search,
+        };
+    }
+
+    search() {
+        if (this.state.search.length < 1) {
+            return;
+        }
+
+        if (this.state.search.length > 100) {
+            return;
+        }
+
+        this.props.onSearch(this.state.search);
+    }
+
+    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any) {
+        if (prevProps.search !== this.props.search) {
+            this.setState({
+                search: this.props.search,
+            });
+        }
+    }
+
+    handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({
+            search: event.target.value,
+        });
     }
 
     public render(): JSX.Element {
@@ -10,11 +49,19 @@ class KeywordSearch extends React.Component<any, any> {
             <div className="search-widget">
                 <div className="row">
                     <div className="col-8 pr-1">
-                        <input name="searchInput" id="searchInput" placeholder="Enter Search..."></input>
+                        <input
+                            name="searchInput"
+                            id="searchInput"
+                            placeholder="Enter Search..."
+                            value={this.state.search}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.handleChange(event)}
+                        ></input>
                     </div>
 
                     <div className="col-4 pl-1">
-                        <button className="btn btn-primary">Search</button>
+                        <button className="btn btn-primary" onClick={() => this.search()}>
+                            Search
+                        </button>
                     </div>
                 </div>
             </div>

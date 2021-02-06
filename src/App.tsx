@@ -11,6 +11,7 @@ import URLParser from './book/URLParser';
 import BookService from './book/BookService';
 import TranslationService from './book/TranslationService';
 import SearchResults from './search/SearchResults';
+import IVerse from './book/IVerse';
 
 interface ISearch {
     isLoading: boolean;
@@ -23,6 +24,7 @@ interface IState {
     translation: ITranslation;
     book: IBook;
     chapterId: number;
+    verseId: number;
     isNavOpen: boolean;
     tmpIsNavOpen: boolean;
     search: ISearch;
@@ -45,7 +47,7 @@ class App extends React.Component<RouteComponentProps, IState> {
 
         this.history = this.props.history;
 
-        const parser = new URLParser(this.props.location.pathname);
+        const parser = new URLParser(this.props.location.pathname, this.props.location.search);
 
         this.state = {
             title: 'Loading',
@@ -65,6 +67,7 @@ class App extends React.Component<RouteComponentProps, IState> {
                 search: '',
             },
             chapterId: parser.getChapterId(),
+            verseId: parser.getVerseId(),
             isNavOpen: true,
             tmpIsNavOpen: true,
         };
@@ -73,7 +76,7 @@ class App extends React.Component<RouteComponentProps, IState> {
     init(pathname: string, search: string) {
         if (pathname.startsWith('/book')) {
             // Skip if we aren't on the book page and the nav is closed
-            const parser = new URLParser(pathname);
+            const parser = new URLParser(pathname, search);
 
             let book: IBook;
             let translation: ITranslation;
@@ -94,6 +97,7 @@ class App extends React.Component<RouteComponentProps, IState> {
                         subTitle: book.testament == 'OT' ? ' - Old Testament' : ' - New Testament',
                         book: book,
                         chapterId: parser.getChapterId(),
+                        verseId: parser.getVerseId(),
                     });
                 });
         }
@@ -116,7 +120,7 @@ class App extends React.Component<RouteComponentProps, IState> {
     }
 
     onChangeTranslation(translation: ITranslation) {
-        const parser = new URLParser(this.props.location.pathname);
+        const parser = new URLParser(this.props.location.pathname, this.props.location.search);
 
         if (!parser.isBookURL()) {
             return;
@@ -139,10 +143,25 @@ class App extends React.Component<RouteComponentProps, IState> {
         this.unlisten();
     }
 
-    onChangeBook(book: IBook, chapterId: number) {
-        const parser = new URLParser(this.props.location.pathname);
+    onChangeBook(book: IBook, chapterId: number, verseId: number) {
+        const parser = new URLParser(this.props.location.pathname, this.props.location.search);
 
         if (!parser.isBookURL() && !this.state.isNavOpen) {
+            return;
+        }
+
+        if (verseId != 0) {
+            this.history.push(
+                '/book/' +
+                    this.state.translation.abbreviation.toLowerCase() +
+                    '/' +
+                    book.id +
+                    '/' +
+                    chapterId +
+                    '?verseId=' +
+                    verseId,
+            );
+
             return;
         }
 
@@ -164,10 +183,17 @@ class App extends React.Component<RouteComponentProps, IState> {
         return;
     }
 
-    toggleCrossRefModal(open: boolean) {
+    toggleCrossRefModal(selectedVerse: IVerse | undefined, open: boolean) {
+        let verseId = 0;
+
+        if (selectedVerse?.verseId) {
+            verseId = selectedVerse.verseId;
+        }
+
         if (open) {
             this.setState({
                 isNavOpen: false,
+                verseId: verseId,
             });
 
             return;
@@ -175,6 +201,7 @@ class App extends React.Component<RouteComponentProps, IState> {
 
         this.setState({
             isNavOpen: this.state.tmpIsNavOpen,
+            verseId: 0,
         });
     }
 
@@ -205,7 +232,9 @@ class App extends React.Component<RouteComponentProps, IState> {
                     <div className="ml-3 pull-left title">
                         <h2>
                             <b>{this.state.title}</b>
-                            <span className="hide-xs">&nbsp;{this.state.subTitle}</span>
+                            <span className="hide-xs">
+                                &nbsp;<em>{this.state.subTitle}</em>
+                            </span>
                         </h2>
                     </div>
                     <div className="pull-right translation-widget">
@@ -229,7 +258,9 @@ class App extends React.Component<RouteComponentProps, IState> {
                         <BookSelector
                             selectedBook={this.state.book.id}
                             selectedChapter={this.state.chapterId}
-                            onChange={(book: IBook, chapterId: number) => this.onChangeBook(book, chapterId)}
+                            onChange={(book: IBook, chapterId: number, verseId: number) =>
+                                this.onChangeBook(book, chapterId, verseId)
+                            }
                         />
                     </div>
                 </div>
@@ -241,7 +272,10 @@ class App extends React.Component<RouteComponentProps, IState> {
                                     translation={this.state.translation}
                                     bookId={this.state.book.id}
                                     chapterId={this.state.chapterId}
-                                    toggleCrossRefModal={(open) => this.toggleCrossRefModal(open)}
+                                    verseId={this.state.verseId}
+                                    toggleCrossRefModal={(selectedVerse: IVerse | undefined, open: boolean) =>
+                                        this.toggleCrossRefModal(selectedVerse, open)
+                                    }
                                 />
                             </Route>
 
@@ -251,6 +285,9 @@ class App extends React.Component<RouteComponentProps, IState> {
                                     isLoading={this.state.search.isLoading}
                                     search={this.state.search.search}
                                     translationAbbr={this.state.translation.abbreviation}
+                                    onChange={(book: IBook, chapterId: number, verseId: number) =>
+                                        this.onChangeBook(book, chapterId, verseId)
+                                    }
                                 />
                             </Route>
 

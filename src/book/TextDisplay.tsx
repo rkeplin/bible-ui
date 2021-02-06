@@ -1,5 +1,4 @@
 import React from 'react';
-import Config from '../Config';
 import VerseDisplay from './VerseDisplay';
 import IBook from './IBook';
 import ITranslation from './ITranslation';
@@ -11,7 +10,8 @@ interface IProps {
     translation: ITranslation;
     bookId: number;
     chapterId: number;
-    toggleCrossRefModal: (open: boolean) => void;
+    verseId: number;
+    toggleCrossRefModal: (selectedVerse: IVerse | undefined, open: boolean) => void;
 }
 
 interface IState {
@@ -50,6 +50,10 @@ class TextDisplay extends React.Component<IProps, IState> {
                 for (let i = 0; i < result.length; i++) {
                     result[i].highlight = false;
 
+                    if (this.props.verseId === result[i].verseId) {
+                        result[i].highlight = true;
+                    }
+
                     if (i < result.length / 2) {
                         versesLeft.push(result[i]);
 
@@ -73,6 +77,10 @@ class TextDisplay extends React.Component<IProps, IState> {
 
     public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any) {
         let update = false;
+
+        if (prevProps.verseId !== this.props.verseId) {
+            update = true;
+        }
 
         if (prevProps.chapterId !== this.props.chapterId) {
             update = true;
@@ -103,12 +111,12 @@ class TextDisplay extends React.Component<IProps, IState> {
         });
     }
 
-    toggleCrossRefModal(open: boolean) {
+    public toggleCrossRefModal(open: boolean) {
         this.setState({
             displayCrossRefs: open,
         });
 
-        this.props.toggleCrossRefModal(open);
+        this.props.toggleCrossRefModal(this.state.selectedVerse, open);
     }
 
     public render(): JSX.Element {

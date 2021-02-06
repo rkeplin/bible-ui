@@ -1,6 +1,5 @@
 import React from 'react';
 import IVerse from './IVerse';
-import Config from '../Config';
 import ITranslation from './ITranslation';
 import BookService from './BookService';
 
@@ -35,6 +34,12 @@ class CrossReference extends React.Component<IProps, IState> {
                 display: 'none',
             },
         };
+    }
+
+    onClose(event: React.MouseEvent) {
+        event.preventDefault();
+
+        this.close();
     }
 
     close() {
@@ -132,7 +137,7 @@ class CrossReference extends React.Component<IProps, IState> {
                         Found {this.state.relatedVerses.length} Cross References
                     </i>
                     <span className="pull-right">
-                        <a href="#" onClick={() => this.close()}>
+                        <a href="#" onClick={(event: React.MouseEvent) => this.onClose(event)}>
                             [x] close
                         </a>
                     </span>

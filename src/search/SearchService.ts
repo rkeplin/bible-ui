@@ -1,10 +1,41 @@
 import Config from '../Config';
 import HttpService from '../core/HttpService';
 import ISearchResult from './ISearchResult';
+import ISearchAggregation from './ISearchAggregation';
 
 class SearchService extends HttpService {
     constructor() {
         super(Config.API);
+    }
+
+    public async getAggregation(query: string, translation: string): Promise<ISearchAggregation[]> {
+        return this.httpClient
+            .get('searchAggregator', {
+                params: {
+                    query: query,
+                    translation: translation,
+                },
+            })
+            .then((response) => {
+                const items: ISearchAggregation[] = [];
+
+                if (response.status !== 200) {
+                    return items;
+                }
+
+                if (response.data === null) {
+                    return items;
+                }
+
+                for (let i = 0; i < response.data.length; i++) {
+                    items.push({
+                        book: response.data[i].book,
+                        hits: response.data[i].hits,
+                    });
+                }
+
+                return items;
+            });
     }
 
     public async getAll(query: string, translation: string, offset: number, limit: number): Promise<ISearchResult> {

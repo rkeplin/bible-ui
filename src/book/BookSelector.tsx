@@ -17,7 +17,7 @@ interface IState {
 interface IProps {
     selectedBook: number;
     selectedChapter: number;
-    onChange: (book: IBook, chapterId: number) => void;
+    onChange: (book: IBook, chapterId: number, verseId: number) => void;
 }
 
 class BookSelector extends React.Component<IProps, IState> {
@@ -184,7 +184,7 @@ class BookSelector extends React.Component<IProps, IState> {
     private emit(bookId: number, chapterId: number) {
         for (let i = 0; i < this.state.books.length; i++) {
             if (bookId === this.state.books[i].id) {
-                this.props.onChange(this.state.books[i], chapterId);
+                this.props.onChange(this.state.books[i], chapterId, 0);
                 break;
             }
         }

@@ -9,14 +9,17 @@ class URLParser {
 
     protected chapterId: number;
 
+    protected verseId: number;
+
     protected bookUrl: boolean;
 
-    constructor(url: string) {
+    constructor(url: string, queryString: string) {
         this.url = url;
         this.bookUrl = false;
         this.translation = 'KJV';
         this.bookId = 1;
         this.chapterId = 1;
+        this.verseId = 0;
 
         const matches = url.match(URLParser.REGEX);
 
@@ -26,6 +29,10 @@ class URLParser {
             this.chapterId = parseInt(matches[3]);
 
             this.bookUrl = true;
+        }
+
+        if (queryString.startsWith('?verseId=')) {
+            this.verseId = parseInt(queryString.substr(9, queryString.length));
         }
     }
 
@@ -43,6 +50,10 @@ class URLParser {
 
     public getChapterId() {
         return this.chapterId;
+    }
+
+    public getVerseId() {
+        return this.verseId;
     }
 }
 

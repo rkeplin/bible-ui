@@ -173,6 +173,8 @@ class App extends React.Component<RouteComponentProps, IState> {
             return;
         }
 
+        window.scrollTo(0, 0);
+
         if (verseId != 0) {
             this.history.push(
                 '/book/' +
@@ -194,6 +196,8 @@ class App extends React.Component<RouteComponentProps, IState> {
     }
 
     onSearch(search: string) {
+        window.scrollTo(0, 0);
+
         this.history.push('/search/' + this.state.translation.abbreviation.toLowerCase() + '?query=' + search);
     }
 

@@ -38,6 +38,18 @@ class KeywordSearch extends React.Component<IProps, IState> {
         }
     }
 
+    handleKeyPress(event: any /* React.KeyboardEvent<HTMLInputElement> */) {
+        if (event.key.toUpperCase() !== 'ENTER') {
+            return;
+        }
+
+        this.setState({
+            search: event.target.value,
+        });
+
+        this.search();
+    }
+
     handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         this.setState({
             search: event.target.value,
@@ -54,6 +66,7 @@ class KeywordSearch extends React.Component<IProps, IState> {
                             id="searchInput"
                             placeholder="Enter Search..."
                             value={this.state.search}
+                            onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) => this.handleKeyPress(event)}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.handleChange(event)}
                         ></input>
                     </div>

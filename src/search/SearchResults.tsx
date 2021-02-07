@@ -4,6 +4,7 @@ import ISearchResult from './ISearchResult';
 import IVerse from '../book/IVerse';
 import ISearchAggregation from './ISearchAggregation';
 import IBook from '../book/IBook';
+import SearchChart from './chart/SearchChart';
 
 interface IProps {
     isLoading: boolean;
@@ -24,6 +25,7 @@ interface IState {
 class SearchResults extends React.Component<IProps, IState> {
     protected offset: number;
     protected limit: number;
+    protected searchChart: any;
 
     constructor(props: any) {
         super(props);
@@ -101,9 +103,6 @@ class SearchResults extends React.Component<IProps, IState> {
                     } else {
                         otHits += searchAggregation[i].hits;
                     }
-
-                    // chart.data.labels[i] = searchAggregation[i].book.name;
-                    // chart.data.datasets[0].data[i] = searchAggregation[i].hits;
                 }
 
                 this.setState({
@@ -112,9 +111,10 @@ class SearchResults extends React.Component<IProps, IState> {
                     ntHits: ntHits,
                 });
 
-                // setTimeout(function() {
-                //     chart.update();
-                // }, 250);
+                return searchAggregation;
+            })
+            .then((searchAggregation) => {
+                this.searchChart.update(searchAggregation);
             });
     }
 
@@ -129,6 +129,8 @@ class SearchResults extends React.Component<IProps, IState> {
     public componentDidMount() {
         this.load();
         this.loadAggregate();
+
+        this.searchChart = new SearchChart('graph');
     }
 
     public onVerseClick(e: React.MouseEvent, verse: IVerse) {

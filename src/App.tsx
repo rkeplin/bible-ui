@@ -103,12 +103,24 @@ class App extends React.Component<RouteComponentProps, IState> {
         }
 
         if (pathname.startsWith('/search')) {
-            this.setState({
-                search: {
-                    search: search.substring(7, search.length),
-                    isLoading: true,
-                },
-            });
+            const parser = new URLParser(pathname, search);
+
+            let translation: ITranslation;
+
+            this.translationService
+                .get(parser.getTranslation())
+                .then((result) => {
+                    translation = result;
+                })
+                .then(() => {
+                    this.setState({
+                        translation: translation,
+                        search: {
+                            search: search.substring(7, search.length),
+                            isLoading: true,
+                        },
+                    });
+                });
         }
     }
 
@@ -122,13 +134,24 @@ class App extends React.Component<RouteComponentProps, IState> {
     onChangeTranslation(translation: ITranslation) {
         const parser = new URLParser(this.props.location.pathname, this.props.location.search);
 
-        if (!parser.isBookURL()) {
+        if (parser.isSearchURL()) {
+            this.history.push('/search/' + translation.abbreviation.toLowerCase() + this.props.location.search);
+
             return;
         }
 
-        this.history.push(
-            '/book/' + translation.abbreviation.toLowerCase() + '/' + this.state.book.id + '/' + this.state.chapterId,
-        );
+        if (parser.isBookURL()) {
+            this.history.push(
+                '/book/' +
+                    translation.abbreviation.toLowerCase() +
+                    '/' +
+                    this.state.book.id +
+                    '/' +
+                    this.state.chapterId,
+            );
+
+            return;
+        }
     }
 
     componentDidMount() {
@@ -171,7 +194,7 @@ class App extends React.Component<RouteComponentProps, IState> {
     }
 
     onSearch(search: string) {
-        this.history.push('/search?query=' + search);
+        this.history.push('/search/' + this.state.translation.abbreviation.toLowerCase() + '?query=' + search);
     }
 
     onChangeTitle(title: string, subTitle: string) {
@@ -279,7 +302,7 @@ class App extends React.Component<RouteComponentProps, IState> {
                                 />
                             </Route>
 
-                            <Route path="/search">
+                            <Route path="/search/:translation">
                                 <SearchResults
                                     changeTitle={(title, subTitle) => this.onChangeTitle(title, subTitle)}
                                     isLoading={this.state.search.isLoading}

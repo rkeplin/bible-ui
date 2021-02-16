@@ -1,19 +1,29 @@
 import React from 'react';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-class UserMenu extends React.Component<any, any> {
-    constructor(props: any) {
+class UserMenu extends React.Component<RouteComponentProps, any> {
+    constructor(props: RouteComponentProps) {
         super(props);
+    }
+
+    private onLoginClick(event: React.MouseEvent) {
+        event.preventDefault();
+
+        this.props.history.push('/user/login');
     }
 
     public render(): JSX.Element {
         return (
             <div style={{ display: 'inline-block' }}>
                 <div style={{ display: 'inline-block' }}>
-                    <a href="" className="btn btn-primary ml-2 btn-sm">
+                    <a
+                        href=""
+                        onClick={(event: React.MouseEvent) => this.onLoginClick(event)}
+                        className="btn btn-primary ml-2 btn-sm"
+                    >
                         Log in
                     </a>
                 </div>
-
                 {/*<div style={{ display: 'inline-block' }}>*/}
                 {/*    <button*/}
                 {/*        type="button"*/}
@@ -38,4 +48,4 @@ class UserMenu extends React.Component<any, any> {
     }
 }
 
-export default UserMenu;
+export default withRouter(UserMenu);

@@ -12,6 +12,9 @@ import BookService from './book/BookService';
 import TranslationService from './book/TranslationService';
 import SearchResults from './search/SearchResults';
 import IVerse from './book/IVerse';
+import LoginForm from './user/LoginForm';
+import RegistrationForm from './user/RegistrationForm';
+import Logout from './user/Logout';
 
 interface ISearch {
     isLoading: boolean;
@@ -74,6 +77,24 @@ class App extends React.Component<RouteComponentProps, IState> {
     }
 
     init(pathname: string, search: string) {
+        if (pathname.startsWith('/user/login')) {
+            this.setState({
+                title: 'User',
+                subTitle: ' - Login',
+            });
+
+            return;
+        }
+
+        if (pathname.startsWith('/user/register')) {
+            this.setState({
+                title: 'User',
+                subTitle: ' - Register',
+            });
+
+            return;
+        }
+
         if (pathname.startsWith('/book')) {
             // Skip if we aren't on the book page and the nav is closed
             const parser = new URLParser(pathname, search);
@@ -316,6 +337,18 @@ class App extends React.Component<RouteComponentProps, IState> {
                                         this.onChangeBook(book, chapterId, verseId)
                                     }
                                 />
+                            </Route>
+
+                            <Route path="/user/login">
+                                <LoginForm />
+                            </Route>
+
+                            <Route path="/user/logout">
+                                <Logout />
+                            </Route>
+
+                            <Route path="/user/register">
+                                <RegistrationForm />
                             </Route>
 
                             <Redirect to="/book/kjv/1/1"></Redirect>

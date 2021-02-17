@@ -36,9 +36,7 @@ class RegistrationForm extends React.Component<RouteComponentProps, IState> {
         this.service
             .register(this.state.email, this.state.password, this.state.passwordConfirmation)
             .then((response) => {
-                console.log(response);
-
-                // TODO: Handle successful registration
+                this.props.history.push('/list');
 
                 return response;
             })
@@ -55,6 +53,14 @@ class RegistrationForm extends React.Component<RouteComponentProps, IState> {
             .finally(() => {
                 window.scrollTo(0, 0);
             });
+    }
+
+    protected handleKeyPress(event: any /* React.KeyboardEvent<HTMLInputElement> */) {
+        if (event.key.toUpperCase() !== 'ENTER') {
+            return;
+        }
+
+        this.onRegisterClick();
     }
 
     protected onCancelClick(event: React.MouseEvent) {
@@ -123,6 +129,9 @@ class RegistrationForm extends React.Component<RouteComponentProps, IState> {
                                         value={this.state.passwordConfirmation}
                                         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                                             this.setState({ passwordConfirmation: event.target.value })
+                                        }
+                                        onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) =>
+                                            this.handleKeyPress(event)
                                         }
                                         placeholder="Enter password confirmation..."
                                     />

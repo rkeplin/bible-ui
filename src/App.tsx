@@ -15,6 +15,8 @@ import IVerse from './book/IVerse';
 import LoginForm from './user/LoginForm';
 import RegistrationForm from './user/RegistrationForm';
 import Logout from './user/Logout';
+import ManageLists from './list/ManageLists';
+import ListContent from './list/ListContent';
 
 interface ISearch {
     isLoading: boolean;
@@ -90,6 +92,24 @@ class App extends React.Component<RouteComponentProps, IState> {
             this.setState({
                 title: 'User',
                 subTitle: ' - Register',
+            });
+
+            return;
+        }
+
+        if (pathname == '/list') {
+            this.setState({
+                title: 'Manage Lists',
+                subTitle: '',
+            });
+
+            return;
+        }
+
+        if (pathname.match(/^\/list\/[a-z0-9]+\/verses$/)) {
+            this.setState({
+                title: 'Manage Lists',
+                subTitle: ' - Add Verses',
             });
 
             return;
@@ -351,6 +371,13 @@ class App extends React.Component<RouteComponentProps, IState> {
                                 <RegistrationForm />
                             </Route>
 
+                            <Route path="/list/:listId/verses">
+                                <ListContent />
+                            </Route>
+
+                            <Route path="/list">
+                                <ManageLists />
+                            </Route>
                             <Redirect to="/book/kjv/1/1"></Redirect>
                         </Switch>
                     </div>

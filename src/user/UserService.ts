@@ -2,6 +2,12 @@ import Config from '../Config';
 import HttpService from '../core/HttpService';
 import { AxiosResponse, AxiosError } from 'axios';
 
+export interface IUser {
+    dateRegistered: string;
+    email: string;
+    id: string;
+}
+
 class UserService extends HttpService {
     constructor() {
         super(Config.USER_API);
@@ -44,11 +50,15 @@ class UserService extends HttpService {
             });
     }
 
-    public async me(): Promise<any> {
+    public async me(): Promise<IUser> {
         return this.httpClient
             .get('authenticate/me', { withCredentials: true })
             .then((response: AxiosResponse) => {
-                return response;
+                return {
+                    dateRegistered: response.data.dateRegistered,
+                    email: response.data.email,
+                    id: response.data.id,
+                };
             })
             .catch((reason: AxiosError) => {
                 return Promise.reject(reason);

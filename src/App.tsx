@@ -17,6 +17,7 @@ import RegistrationForm from './user/RegistrationForm';
 import Logout from './user/Logout';
 import ManageLists from './list/ManageLists';
 import ListContent from './list/ListContent';
+import UserService, { IUser } from './user/UserService';
 
 interface ISearch {
     isLoading: boolean;
@@ -33,6 +34,7 @@ interface IState {
     isNavOpen: boolean;
     tmpIsNavOpen: boolean;
     search: ISearch;
+    loggedIn: boolean;
 }
 
 class App extends React.Component<RouteComponentProps, IState> {
@@ -44,11 +46,14 @@ class App extends React.Component<RouteComponentProps, IState> {
 
     protected translationService: TranslationService;
 
+    protected userService: UserService;
+
     constructor(props: RouteComponentProps) {
         super(props);
 
         this.bookService = new BookService();
         this.translationService = new TranslationService();
+        this.userService = new UserService();
 
         this.history = this.props.history;
 
@@ -75,6 +80,7 @@ class App extends React.Component<RouteComponentProps, IState> {
             verseId: parser.getVerseId(),
             isNavOpen: true,
             tmpIsNavOpen: true,
+            loggedIn: false,
         };
     }
 
@@ -83,6 +89,16 @@ class App extends React.Component<RouteComponentProps, IState> {
             this.setState({
                 title: 'User',
                 subTitle: ' - Login',
+            });
+
+            return;
+        }
+
+        if (pathname.startsWith('/user/logout')) {
+            this.setState({
+                title: 'User',
+                subTitle: ' - Logging out',
+                loggedIn: false,
             });
 
             return;
@@ -195,12 +211,27 @@ class App extends React.Component<RouteComponentProps, IState> {
         }
     }
 
+    onLogin() {
+        this.setState({
+            loggedIn: true,
+        });
+    }
+
     componentDidMount() {
         this.init(this.props.location.pathname, this.props.location.search);
 
         this.unlisten = this.props.history.listen((location) => {
             this.init(location.pathname, location.search);
         });
+
+        this.userService
+            .me()
+            .then(() => {
+                this.setState({ loggedIn: true });
+            })
+            .catch(() => {
+                this.setState({ loggedIn: false });
+            });
     }
 
     componentWillUnmount() {
@@ -310,7 +341,7 @@ class App extends React.Component<RouteComponentProps, IState> {
                             selectedTranslation={this.state.translation}
                             onChange={(translation: ITranslation) => this.onChangeTranslation(translation)}
                         />
-                        <UserMenu />
+                        <UserMenu loggedIn={this.state.loggedIn} />
                     </div>
                 </div>
 
@@ -360,7 +391,7 @@ class App extends React.Component<RouteComponentProps, IState> {
                             </Route>
 
                             <Route path="/user/login">
-                                <LoginForm />
+                                <LoginForm onLogin={() => this.onLogin()} />
                             </Route>
 
                             <Route path="/user/logout">

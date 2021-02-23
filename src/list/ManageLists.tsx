@@ -28,8 +28,6 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
         this.userService
             .me()
             .then((user: IUser) => {
-                console.log(user);
-
                 this.listService.getAll().then((lists) => {
                     this.setState({
                         isLoading: false,

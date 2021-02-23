@@ -3,6 +3,10 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import UserService from './UserService';
 import { AxiosError } from 'axios';
 
+interface IProps extends RouteComponentProps {
+    onLogin: () => void;
+}
+
 interface IState {
     isLoading: boolean;
     email: string;
@@ -12,10 +16,10 @@ interface IState {
     errors: string[];
 }
 
-class LoginForm extends React.Component<RouteComponentProps, IState> {
+class LoginForm extends React.Component<IProps, IState> {
     protected service: UserService;
 
-    constructor(props: RouteComponentProps) {
+    constructor(props: IProps) {
         super(props);
 
         this.service = new UserService();
@@ -38,6 +42,7 @@ class LoginForm extends React.Component<RouteComponentProps, IState> {
         this.service
             .login(this.state.email, this.state.password)
             .then((response) => {
+                this.props.onLogin();
                 this.props.history.push('/list');
 
                 return response;

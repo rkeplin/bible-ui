@@ -2,10 +2,21 @@ import React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import UserService, { IUser } from '../user/UserService';
 import ListService, { IList } from './ListService';
+import FormError, { IFormError } from '../core/FormError';
+import { AxiosError } from 'axios';
+import moment from 'moment';
 
 interface IState {
     isLoading: boolean;
+    isSaving: boolean;
     lists: IList[];
+    list: IList;
+    addError: IFormError;
+    updateError: IFormError;
+    deleteError: IFormError;
+    displayAddDialog: boolean;
+    displayUpdateDialog: boolean;
+    displayDeleteDialog: boolean;
 }
 
 class ManageLists extends React.Component<RouteComponentProps, IState> {
@@ -20,25 +31,216 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
 
         this.state = {
             isLoading: true,
+            isSaving: false,
             lists: [],
+            list: {
+                id: '',
+                name: '',
+                dateAdded: '',
+            },
+            addError: {
+                hasError: false,
+                errorDescription: '',
+                errors: [],
+            },
+            updateError: {
+                hasError: false,
+                errorDescription: '',
+                errors: [],
+            },
+            deleteError: {
+                hasError: false,
+                errorDescription: '',
+                errors: [],
+            },
+            displayAddDialog: false,
+            displayUpdateDialog: false,
+            displayDeleteDialog: false,
         };
+    }
+
+    public onWindowKeyDown(event: KeyboardEvent) {
+        switch (event.key) {
+            case 'Escape':
+                this.clearDialogs();
+                break;
+        }
+    }
+
+    public handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>, callback: () => void) {
+        switch (event.key) {
+            case 'Enter':
+                callback();
+                break;
+        }
+    }
+
+    protected clearDialogs() {
+        this.setState({
+            list: {
+                id: '',
+                name: '',
+                dateAdded: '',
+            },
+            addError: {
+                hasError: false,
+                errorDescription: '',
+                errors: [],
+            },
+            updateError: {
+                hasError: false,
+                errorDescription: '',
+                errors: [],
+            },
+            deleteError: {
+                hasError: false,
+                errorDescription: '',
+                errors: [],
+            },
+            displayAddDialog: false,
+            displayUpdateDialog: false,
+            displayDeleteDialog: false,
+        });
+    }
+
+    public load() {
+        this.listService.getAll().then((lists) => {
+            this.setState({
+                isLoading: false,
+                lists: lists,
+            });
+        });
     }
 
     public componentDidMount() {
         this.userService
             .me()
             .then((user: IUser) => {
-                this.listService.getAll().then((lists) => {
-                    this.setState({
-                        isLoading: false,
-                        lists: lists,
-                    });
-                });
+                this.load();
             })
             .catch(() => {
                 this.props.history.push('/user/login');
 
                 window.scrollTo(0, 0);
+            });
+
+        window.addEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
+    }
+
+    public onAddListClick(event: React.MouseEvent) {
+        event.preventDefault();
+
+        this.setState({
+            displayAddDialog: true,
+        });
+    }
+
+    public onUpdateListClick(event: React.MouseEvent, list: IList) {
+        event.preventDefault();
+
+        this.setState({
+            list: list,
+            displayUpdateDialog: true,
+        });
+    }
+
+    public onDeleteListClick(event: React.MouseEvent, list: IList) {
+        event.preventDefault();
+
+        this.setState({
+            list: list,
+            displayDeleteDialog: true,
+        });
+    }
+
+    public async create(list: IList) {
+        this.setState({
+            isSaving: true,
+        });
+
+        this.listService
+            .add(list)
+            .then(() => {
+                this.load();
+                this.clearDialogs();
+            })
+            .catch((error: AxiosError) => {
+                this.setState({
+                    addError: {
+                        hasError: true,
+                        errorDescription: error.response?.data?.description
+                            ? error.response?.data?.description
+                            : 'Error',
+                        errors: error.response?.data?.errors ? error.response?.data?.errors : [],
+                    },
+                });
+            })
+            .finally(() => {
+                this.setState({
+                    isSaving: false,
+                });
+            });
+    }
+
+    public async update(list: IList) {
+        this.setState({
+            isSaving: true,
+        });
+
+        this.listService
+            .update(list.id, list)
+            .then(() => {
+                this.load();
+                this.clearDialogs();
+            })
+            .catch((error: AxiosError) => {
+                this.setState({
+                    addError: {
+                        hasError: true,
+                        errorDescription: error.response?.data?.description
+                            ? error.response?.data?.description
+                            : 'Error',
+                        errors: error.response?.data?.errors ? error.response?.data?.errors : [],
+                    },
+                });
+            })
+            .finally(() => {
+                this.setState({
+                    isSaving: false,
+                });
+            });
+    }
+
+    public async remove(list: IList) {
+        this.setState({
+            isSaving: true,
+        });
+
+        this.listService
+            .remove(list.id)
+            .then(() => {
+                this.load();
+                this.clearDialogs();
+            })
+            .catch((error: AxiosError) => {
+                this.setState({
+                    addError: {
+                        hasError: true,
+                        errorDescription: error.response?.data?.description
+                            ? error.response?.data?.description
+                            : 'Error',
+                        errors: error.response?.data?.errors ? error.response?.data?.errors : [],
+                    },
+                });
+            })
+            .finally(() => {
+                this.setState({
+                    isSaving: false,
+                });
             });
     }
 
@@ -49,7 +251,11 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                     <div className="card">
                         <div className="card-header">
                             Lists
-                            <button className="btn btn-secondary btn-sm pull pull-right" ng-click="vm.showAddForm()">
+                            <button
+                                className="btn btn-secondary btn-sm pull pull-right"
+                                disabled={this.state.isLoading}
+                                onClick={(event: React.MouseEvent) => this.onAddListClick(event)}
+                            >
                                 Add List
                             </button>
                         </div>
@@ -62,7 +268,11 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                                 }}
                             >
                                 You don&apos;t have a list yet.{' '}
-                                <a href="" ng-hide="vm.toggleAddForm" ng-click="vm.showAddForm()">
+                                <a
+                                    href=""
+                                    style={{ display: this.state.lists.length < 50 ? 'inline-block' : 'none' }}
+                                    onClick={(event: React.MouseEvent) => this.onAddListClick(event)}
+                                >
                                     Add a list.
                                 </a>
                             </div>
@@ -80,16 +290,28 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                                             Action
                                         </button>
                                         <div className="dropdown-menu">
-                                            <a className="dropdown-item" href="" ng-click="vm.showUpdateForm(list)">
+                                            <a
+                                                className="dropdown-item"
+                                                href=""
+                                                onClick={(event: React.MouseEvent) =>
+                                                    this.onUpdateListClick(event, list)
+                                                }
+                                            >
                                                 Rename
                                             </a>
-                                            <a className="dropdown-item" href="" ng-click="vm.showDeleteForm(list)">
+                                            <a
+                                                className="dropdown-item"
+                                                href=""
+                                                onClick={(event: React.MouseEvent) =>
+                                                    this.onDeleteListClick(event, list)
+                                                }
+                                            >
                                                 Delete
                                             </a>
                                         </div>
 
                                         <p>
-                                            <b>Updated</b> - <i>{list.dateAdded}</i>
+                                            <b>Updated</b> - <i>{moment(list.dateUpdated).format('MMM Do, YYYY')}</i>
                                         </p>
 
                                         <p>
@@ -110,97 +332,130 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                         </div>
                     </div>
 
-                    {/*<div ng-show="vm.toggleAddForm" className="overlay">*/}
-                    {/*    <div className="dialog">*/}
-                    {/*        <div className="alert alert-danger mb-3" ng-show="vm.error">*/}
-                    {/*            <p ng-show="vm.error.description"><b>{{vm.error.description}}</b></p>*/}
-                    {/*            <ul ng-show="vm.error.errors">*/}
-                    {/*                <li ng-repeat="error in vm.error.errors">{{error}}</li>*/}
-                    {/*            </ul>*/}
-                    {/*        </div>*/}
+                    <div style={{ display: this.state.displayAddDialog ? 'block' : 'none' }} className="overlay">
+                        <div className="dialog">
+                            <FormError
+                                hasError={this.state.addError.hasError}
+                                errorDescription={this.state.addError.errorDescription}
+                                errors={this.state.addError.errors}
+                            />
 
-                    {/*        <div className="card">*/}
-                    {/*            <div className="card-header">*/}
-                    {/*                Create List*/}
-                    {/*            </div>*/}
-                    {/*            <div className="card-body">*/}
-                    {/*                <input name="name"*/}
-                    {/*                       className="form-control"*/}
-                    {/*                       ng-model="vm.list.name"*/}
-                    {/*                       type="text"*/}
-                    {/*                       placeholder="Enter list name..."*/}
-                    {/*                       ng-keypress="vm.onKeyPress($event)"/>*/}
-                    {/*            </div>*/}
-                    {/*            <div className="card-footer text-right">*/}
-                    {/*                <button className="btn btn-default" ng-click="vm.toggleAddForm = false">Cancel*/}
-                    {/*                </button>*/}
-                    {/*                <button className="btn btn-primary" ng-disabled="vm.isLoading"*/}
-                    {/*                        ng-click="vm.add(vm.list)">Add*/}
-                    {/*                </button>*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
+                            <div className="card">
+                                <div className="card-header">Create List</div>
+                                <div className="card-body">
+                                    <input
+                                        name="name"
+                                        className="form-control"
+                                        value={this.state.list.name}
+                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                                            this.setState({
+                                                list: {
+                                                    id: this.state.list.id,
+                                                    name: event.target.value,
+                                                    dateAdded: this.state.list.dateAdded,
+                                                },
+                                            })
+                                        }
+                                        type="text"
+                                        placeholder="Enter list name..."
+                                        onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) =>
+                                            this.handleKeyPress(event, () => this.create(this.state.list))
+                                        }
+                                    />
+                                </div>
+                                <div className="card-footer text-right">
+                                    <button className="btn btn-default mr-2" onClick={() => this.clearDialogs()}>
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="btn btn-primary"
+                                        disabled={this.state.isSaving}
+                                        onClick={() => this.create(this.state.list)}
+                                    >
+                                        Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    {/*<div ng-show="vm.toggleUpdateForm" className="overlay">*/}
-                    {/*    <div className="dialog">*/}
-                    {/*        <div className="alert alert-danger mb-3" ng-show="vm.error">*/}
-                    {/*            <p ng-show="vm.error.description"><b>{{vm.error.description}}</b></p>*/}
-                    {/*            <ul ng-show="vm.error.errors">*/}
-                    {/*                <li ng-repeat="error in vm.error.errors">{{error}}</li>*/}
-                    {/*            </ul>*/}
-                    {/*        </div>*/}
+                    <div style={{ display: this.state.displayUpdateDialog ? 'block' : 'none' }} className="overlay">
+                        <div className="dialog">
+                            <FormError
+                                hasError={this.state.updateError.hasError}
+                                errorDescription={this.state.updateError.errorDescription}
+                                errors={this.state.updateError.errors}
+                            />
 
-                    {/*        <div className="card">*/}
-                    {/*            <div className="card-header">*/}
-                    {/*                Rename List*/}
-                    {/*            </div>*/}
-                    {/*            <div className="card-body">*/}
-                    {/*                <input name="name"*/}
-                    {/*                       className="form-control"*/}
-                    {/*                       ng-model="vm.list.name"*/}
-                    {/*                       type="text"*/}
-                    {/*                       placeholder="Enter list name..."*/}
-                    {/*                       ng-keypress="vm.onKeyPress($event)"/>*/}
-                    {/*            </div>*/}
-                    {/*            <div className="card-footer text-right">*/}
-                    {/*                <button className="btn btn-default"*/}
-                    {/*                        ng-click="vm.toggleUpdateForm = false; vm.list.selected = false;">Cancel*/}
-                    {/*                </button>*/}
-                    {/*                <button className="btn btn-primary" ng-disabled="vm.isLoading"*/}
-                    {/*                        ng-click="vm.update(vm.list)">Save*/}
-                    {/*                </button>*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
+                            <div className="card">
+                                <div className="card-header">Rename List</div>
+                                <div className="card-body">
+                                    <input
+                                        name="name"
+                                        className="form-control"
+                                        value={this.state.list.name}
+                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                                            this.setState({
+                                                list: {
+                                                    id: this.state.list.id,
+                                                    name: event.target.value,
+                                                    dateAdded: this.state.list.dateAdded,
+                                                },
+                                            })
+                                        }
+                                        type="text"
+                                        placeholder="Enter list name..."
+                                        onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) =>
+                                            this.handleKeyPress(event, () => this.update(this.state.list))
+                                        }
+                                    />
+                                </div>
+                                <div className="card-footer text-right">
+                                    <button className="btn btn-default mr-2" onClick={() => this.clearDialogs()}>
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="btn btn-primary"
+                                        disabled={this.state.isSaving}
+                                        onClick={() => this.update(this.state.list)}
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    {/*<div ng-show="vm.toggleDeleteForm" className="overlay">*/}
-                    {/*    <div className="dialog">*/}
-                    {/*        <div className="alert alert-danger mb-3" ng-show="vm.error">*/}
-                    {/*            <p ng-show="vm.error.description"><b>{{vm.error.description}}</b></p>*/}
-                    {/*            <ul ng-show="vm.error.errors">*/}
-                    {/*                <li ng-repeat="error in vm.error.errors">{{error}}</li>*/}
-                    {/*            </ul>*/}
-                    {/*        </div>*/}
+                    <div style={{ display: this.state.displayDeleteDialog ? 'block' : 'none' }} className="overlay">
+                        <div className="dialog">
+                            <FormError
+                                hasError={this.state.deleteError.hasError}
+                                errorDescription={this.state.deleteError.errorDescription}
+                                errors={this.state.deleteError.errors}
+                            />
 
-                    {/*        <div className="card">*/}
-                    {/*            <div className="card-header">*/}
-                    {/*                Delete List*/}
-                    {/*            </div>*/}
-                    {/*            <div className="card-body">*/}
-                    {/*                <p>Are you sure that you want to remove <b>{{vm.list.name}}</b>?</p>*/}
-                    {/*            </div>*/}
-                    {/*            <div className="card-footer text-right">*/}
-                    {/*                <button className="btn btn-default" ng-click="vm.toggleDeleteForm = false;">No*/}
-                    {/*                </button>*/}
-                    {/*                <button className="btn btn-primary" ng-disabled="vm.isLoading"*/}
-                    {/*                        ng-click="vm.remove(vm.list)">Yes*/}
-                    {/*                </button>*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
+                            <div className="card">
+                                <div className="card-header">Delete List</div>
+                                <div className="card-body">
+                                    <p>
+                                        Are you sure that you want to remove <b>{this.state.list.name}</b>?
+                                    </p>
+                                </div>
+                                <div className="card-footer text-right">
+                                    <button className="btn btn-default mr-2" onClick={() => this.clearDialogs()}>
+                                        No
+                                    </button>
+                                    <button
+                                        className="btn btn-primary"
+                                        disabled={this.state.isSaving}
+                                        onClick={() => this.remove(this.state.list)}
+                                    >
+                                        Yes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );

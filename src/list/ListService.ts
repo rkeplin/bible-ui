@@ -6,6 +6,7 @@ export interface IList {
     id: string;
     name: string;
     dateAdded: string;
+    dateUpdated?: string;
 }
 
 class ListService extends HttpService {
@@ -48,7 +49,7 @@ class ListService extends HttpService {
 
     public async update(id: string, list: IList): Promise<IList> {
         return this.httpClient
-            .post('lists/' + id, list, { withCredentials: true })
+            .put('lists/' + id, list, { withCredentials: true })
             .then((response: AxiosResponse) => {
                 return response.data;
             })

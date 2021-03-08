@@ -7,6 +7,7 @@ interface IVerse {
     verse: string;
     verseId: number;
     highlight: boolean;
+    translation?: string;
 }
 
 export default IVerse;

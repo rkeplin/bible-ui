@@ -1,6 +1,7 @@
 import Config from '../Config';
 import HttpService from '../core/HttpService';
 import { AxiosResponse, AxiosError } from 'axios';
+import IVerse from '../book/IVerse';
 
 export interface IList {
     id: string;
@@ -63,6 +64,39 @@ class ListService extends HttpService {
             .delete('lists/' + id, { withCredentials: true })
             .then((response: AxiosResponse) => {
                 return response;
+            })
+            .catch((reason: AxiosError) => {
+                return Promise.reject(reason);
+            });
+    }
+
+    public getVerses(listId: string): Promise<IVerse[]> {
+        return this.httpClient
+            .get('lists/' + listId + '/verses', { withCredentials: true })
+            .then((response: AxiosResponse) => {
+                return response.data;
+            })
+            .catch((reason: AxiosError) => {
+                return Promise.reject(reason);
+            });
+    }
+
+    public addVerse(listId: string, verseId: string, translation: string) {
+        return this.httpClient
+            .put('lists/' + listId + '/verses/' + verseId + '?translation=' + translation, { withCredentials: true })
+            .then((response: AxiosResponse) => {
+                return response.data;
+            })
+            .catch((reason: AxiosError) => {
+                return Promise.reject(reason);
+            });
+    }
+
+    public removeVerse(listId: string, verseId: string, translation: string) {
+        return this.httpClient
+            .delete('lists/' + listId + '/verses/' + verseId + '?translation=' + translation, { withCredentials: true })
+            .then((response: AxiosResponse) => {
+                return response.data;
             })
             .catch((reason: AxiosError) => {
                 return Promise.reject(reason);

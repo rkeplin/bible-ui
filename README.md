@@ -6,4 +6,3 @@ Make sure docker is running, yarn is installed and `/etc/hosts`  has appropriate
 # To spin up compressed version without yarn
 Make sure docker is running and `/etc/hosts`  has appropriate entries.  With this, you don't need yarn installed.
 * `make prod`
-

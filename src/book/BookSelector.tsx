@@ -2,6 +2,9 @@ import React from 'react';
 import IBook from './IBook';
 import IChapter from './IChapter';
 import BookService from './BookService';
+import IVerse from './IVerse';
+import TranslationService from './TranslationService';
+import ITranslation from './ITranslation';
 
 interface IState {
     selectedBook: number;
@@ -10,14 +13,21 @@ interface IState {
     selectedChapter: number;
     isLoadingChapters: boolean;
     chapters: IChapter[];
+    selectedVerse: number;
+    isLoadingVerses: boolean;
+    verses: IVerse[];
     disablePrevBtn: boolean;
     disableNextBtn: boolean;
 }
 
 interface IProps {
+    selectedTranslation: ITranslation;
     selectedBook: number;
     selectedChapter: number;
-    onChange: (book: IBook, chapterId: number, verseId: number) => void;
+    selectedVerse: number;
+    onChange: (book: IBook, chapterId: number, verse: IVerse) => void;
+    showNavButtons: boolean;
+    showVerses: boolean;
 }
 
 class BookSelector extends React.Component<IProps, IState> {
@@ -31,6 +41,9 @@ class BookSelector extends React.Component<IProps, IState> {
             selectedChapter: this.props.selectedChapter,
             isLoadingChapters: true,
             chapters: [],
+            selectedVerse: this.props.selectedVerse,
+            isLoadingVerses: true,
+            verses: [],
             disablePrevBtn: true,
             disableNextBtn: true,
         };
@@ -39,7 +52,7 @@ class BookSelector extends React.Component<IProps, IState> {
     private handleKeyDown(event: KeyboardEvent) {
         // TODO: Only do this when the user is on the book page
 
-        if (this.state.isLoadingBooks || this.state.isLoadingChapters) {
+        if (this.state.isLoadingBooks || this.state.isLoadingChapters || this.state.isLoadingVerses) {
             return;
         }
 
@@ -57,6 +70,14 @@ class BookSelector extends React.Component<IProps, IState> {
         }
     }
 
+    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any) {
+        if (prevProps.selectedTranslation.abbreviation !== this.props.selectedTranslation.abbreviation) {
+            this.getVerses(this.state.selectedBook, this.state.selectedChapter).then(() => {
+                this.emit(this.state.selectedBook, this.state.selectedChapter, this.state.selectedVerse);
+            });
+        }
+    }
+
     public componentWillUnmount() {
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
     }
@@ -69,6 +90,7 @@ class BookSelector extends React.Component<IProps, IState> {
             disableNextBtn: this.disableNext(this.props.selectedChapter),
             isLoadingBooks: true,
             isLoadingChapters: true,
+            isLoadingVerses: true,
         });
 
         const bookService = new BookService();
@@ -89,7 +111,8 @@ class BookSelector extends React.Component<IProps, IState> {
                     });
                 },
             )
-            .then(() => this.getChapters(this.state.selectedBook));
+            .then(() => this.getChapters(this.state.selectedBook))
+            .then(() => this.getVerses(this.state.selectedBook, this.state.selectedChapter));
     }
 
     private getChapters(bookId: number) {
@@ -98,9 +121,29 @@ class BookSelector extends React.Component<IProps, IState> {
         return service.getChapters(bookId).then(
             (result) => {
                 this.setState({
+                    chapters: result,
+                });
+            },
+            (error) => {
+                console.warn(error);
+
+                this.setState({
+                    chapters: [],
+                });
+            },
+        );
+    }
+
+    private getVerses(bookId: number, chapterId: number) {
+        const service = new BookService();
+
+        return service.getText(bookId, chapterId, this.props.selectedTranslation.abbreviation).then(
+            (result) => {
+                this.setState({
                     isLoadingBooks: false,
                     isLoadingChapters: false,
-                    chapters: result,
+                    isLoadingVerses: false,
+                    verses: result,
                 });
             },
             (error) => {
@@ -109,7 +152,8 @@ class BookSelector extends React.Component<IProps, IState> {
                 this.setState({
                     isLoadingBooks: false,
                     isLoadingChapters: false,
-                    chapters: [],
+                    isLoadingVerses: false,
+                    verses: [],
                 });
             },
         );
@@ -125,18 +169,22 @@ class BookSelector extends React.Component<IProps, IState> {
         this.setState({
             isLoadingBooks: true,
             isLoadingChapters: true,
+            isLoadingVerses: true,
             selectedChapter: newChapter,
             selectedBook: newBook,
+            selectedVerse: 1,
         });
 
-        this.getChapters(newBook).then(() => {
-            this.setState({
-                disablePrevBtn: this.disablePrev(newChapter),
-                disableNextBtn: this.disableNext(newChapter),
+        this.getChapters(newBook)
+            .then(() => this.getVerses(newBook, newChapter))
+            .then(() => {
+                this.setState({
+                    disablePrevBtn: this.disablePrev(newChapter),
+                    disableNextBtn: this.disableNext(newChapter),
+                });
+
+                this.emit(newBook, newChapter, 1);
             });
-
-            this.emit(newBook, newChapter);
-        });
     }
 
     private disablePrev(chapter: number): boolean {
@@ -150,16 +198,33 @@ class BookSelector extends React.Component<IProps, IState> {
     private onChangeChapter = (event: React.FormEvent<HTMLSelectElement>) => {
         const newChapter = parseInt(event.currentTarget.value);
 
+        this.getVerses(this.state.selectedBook, newChapter).then(() => {
+            this.setState({
+                selectedChapter: newChapter,
+                selectedVerse: 1,
+                disablePrevBtn: this.disablePrev(newChapter),
+                disableNextBtn: this.disableNext(newChapter),
+            });
+
+            this.emit(this.state.selectedBook, newChapter, 1);
+        });
+    };
+
+    private onChangeVerse = (event: React.FormEvent<HTMLSelectElement>) => {
+        const newVerse = parseInt(event.currentTarget.value);
+
         this.setState({
-            selectedChapter: newChapter,
-            disablePrevBtn: this.disablePrev(newChapter),
-            disableNextBtn: this.disableNext(newChapter),
+            selectedVerse: newVerse,
         });
 
-        this.emit(this.state.selectedBook, newChapter);
+        this.emit(this.state.selectedBook, this.state.selectedChapter, newVerse);
     };
 
     private next() {
+        if (!this.props.showNavButtons) {
+            return;
+        }
+
         const newChapter = this.state.selectedChapter + 1;
 
         if (newChapter > this.state.chapters.length) {
@@ -167,7 +232,7 @@ class BookSelector extends React.Component<IProps, IState> {
 
             this.changeBook(newBook, 1);
 
-            this.emit(newBook, 1);
+            this.emit(newBook, 1, 1);
 
             return;
         }
@@ -178,19 +243,35 @@ class BookSelector extends React.Component<IProps, IState> {
             disableNextBtn: this.disableNext(newChapter),
         });
 
-        this.emit(this.state.selectedBook, newChapter);
+        this.emit(this.state.selectedBook, newChapter, 1);
     }
 
-    private emit(bookId: number, chapterId: number) {
+    private emit(bookId: number, chapterId: number, verseId: number) {
+        let bookIndex = 0;
+        let verseIndex = 0;
+
         for (let i = 0; i < this.state.books.length; i++) {
             if (bookId === this.state.books[i].id) {
-                this.props.onChange(this.state.books[i], chapterId, 0);
+                bookIndex = i;
                 break;
             }
         }
+
+        for (let i = 0; i < this.state.verses.length; i++) {
+            if (verseId === this.state.verses[i].verseId) {
+                verseIndex = i;
+                break;
+            }
+        }
+
+        this.props.onChange(this.state.books[bookIndex], chapterId, this.state.verses[verseIndex]);
     }
 
     private previous() {
+        if (!this.props.showNavButtons) {
+            return;
+        }
+
         const newChapter = this.state.selectedChapter - 1;
 
         if (newChapter < 1) {
@@ -199,7 +280,7 @@ class BookSelector extends React.Component<IProps, IState> {
             this.getChapters(newBook).then(() => {
                 this.changeBook(newBook, this.state.chapters.length);
 
-                this.emit(newBook, this.state.chapters.length);
+                this.emit(newBook, this.state.chapters.length, 1);
             });
 
             return;
@@ -211,7 +292,7 @@ class BookSelector extends React.Component<IProps, IState> {
             disableNextBtn: this.disableNext(newChapter),
         });
 
-        this.emit(this.state.selectedBook, newChapter);
+        this.emit(this.state.selectedBook, newChapter, 1);
     }
 
     public render(): JSX.Element {
@@ -245,6 +326,12 @@ class BookSelector extends React.Component<IProps, IState> {
             </option>
         ));
 
+        const verses = this.state.verses.map((verse: IVerse) => (
+            <option key={verse.id} value={verse.verseId}>
+                {verse.verseId}
+            </option>
+        ));
+
         return (
             <div className="book-selector-widget">
                 <div className="row">
@@ -260,7 +347,8 @@ class BookSelector extends React.Component<IProps, IState> {
                             <optgroup label="New Testament">{newTestBooks}</optgroup>
                         </select>
                     </div>
-                    <div className="col-4 pl-1">
+
+                    <div className={`${this.props.showVerses ? 'col-2' : 'col-4 pl-1'}`}>
                         <select
                             name="selectedChapter"
                             id="selectedChapter"
@@ -272,7 +360,19 @@ class BookSelector extends React.Component<IProps, IState> {
                         </select>
                     </div>
 
-                    <div className="col-6 pr-1 mt-3">
+                    <div className="col-2 pl-1" style={{ display: this.props.showVerses ? 'block' : 'none' }}>
+                        <select
+                            name="selectedVerse"
+                            id="selectedVerse"
+                            disabled={this.state.isLoadingVerses}
+                            value={this.state.selectedVerse}
+                            onChange={this.onChangeVerse}
+                        >
+                            {verses}
+                        </select>
+                    </div>
+
+                    <div className="col-6 pr-1 mt-3" style={{ display: this.props.showNavButtons ? 'block' : 'none' }}>
                         <button
                             disabled={this.state.isLoadingBooks || this.state.disablePrevBtn}
                             onClick={() => this.previous()}
@@ -281,7 +381,7 @@ class BookSelector extends React.Component<IProps, IState> {
                             Previous
                         </button>
                     </div>
-                    <div className="col-6 pl-1 mt-3">
+                    <div className="col-6 pl-1 mt-3" style={{ display: this.props.showNavButtons ? 'block' : 'none' }}>
                         <button
                             disabled={this.state.isLoadingBooks || this.state.disableNextBtn}
                             onClick={() => this.next()}

@@ -31,6 +31,56 @@ class BookService extends HttpService {
             });
     }
 
+    public async getVerse(
+        bookId: number,
+        chapterId: number,
+        verseId: number,
+        translationAbbr: string,
+    ): Promise<IVerse> {
+        return this.httpClient
+            .get(
+                'books/' +
+                    bookId +
+                    '/chapters/' +
+                    chapterId +
+                    '/' +
+                    verseId +
+                    '?translation=' +
+                    translationAbbr.toLowerCase(),
+            )
+            .then((response: any) => {
+                const verse: IVerse = {
+                    book: {
+                        id: bookId,
+                        testament: '',
+                        name: '',
+                    },
+                    chapterId: chapterId,
+                    id: verseId,
+                    verse: '',
+                    verseId: 0,
+                    highlight: false,
+                    translation: translationAbbr.toUpperCase(),
+                };
+
+                if (response.status !== 200) {
+                    return verse;
+                }
+
+                if (response.data.length < 1) {
+                    return verse;
+                }
+
+                verse.book = response[0].book;
+                verse.id = response[0].id;
+                verse.verse = response[0].verse;
+                verse.verseId = response[0].verseId;
+                verse.translation = response[0].translation;
+
+                return verse;
+            });
+    }
+
     public async getCrossReferences(
         verseId: number | undefined,
         translationAbbr: string | undefined,

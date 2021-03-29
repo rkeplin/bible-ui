@@ -3,6 +3,13 @@ import { RouteComponentProps, withRouter, match } from 'react-router-dom';
 import ListService, { IList } from './ListService';
 import IVerse from '../book/IVerse';
 import { AxiosError } from 'axios';
+import TranslationSelector from '../book/TranslationSelector';
+import ITranslation from '../book/ITranslation';
+import TranslationService from '../book/TranslationService';
+import BookSelector from '../book/BookSelector';
+import IBook from '../book/IBook';
+import BookService from '../book/BookService';
+import FormError, { IFormError } from '../core/FormError';
 
 interface IState {
     isLoadingList: boolean;
@@ -13,6 +20,13 @@ interface IState {
     allowAdd: boolean;
     displayAddDialog: boolean;
     displayDeleteDialog: boolean;
+    selectedTranslation: ITranslation;
+    selectedBookId: number;
+    selectedChapterId: number;
+    selectedVerseId: number;
+    verseToAdd: IVerse;
+    addError: IFormError;
+    deleteError: IFormError;
 }
 
 interface IParams {
@@ -29,11 +43,15 @@ interface IProps extends RouteComponentProps {
 
 class ListContent extends React.Component<IProps, IState> {
     protected listService: ListService;
+    protected translationService: TranslationService;
+    protected bookService: BookService;
 
     constructor(props: any) {
         super(props);
 
         this.listService = new ListService();
+        this.bookService = new BookService();
+        this.translationService = new TranslationService();
 
         this.state = {
             isLoadingList: true,
@@ -60,11 +78,56 @@ class ListContent extends React.Component<IProps, IState> {
             allowAdd: true,
             displayAddDialog: false,
             displayDeleteDialog: false,
+            selectedTranslation: this.translationService.getDefaultTranslation(),
+            selectedBookId: 1,
+            selectedChapterId: 1,
+            selectedVerseId: 1,
+            verseToAdd: {
+                book: {
+                    id: 1,
+                    testament: 'OT',
+                    name: 'Genesis',
+                },
+                chapterId: 1,
+                id: 1001001,
+                verse: 'In the beginning God created the heaven and the earth.',
+                verseId: 1,
+                highlight: false,
+            },
+            addError: {
+                hasError: false,
+                errorDescription: '',
+                errors: [],
+            },
+            deleteError: {
+                hasError: false,
+                errorDescription: '',
+                errors: [],
+            },
         };
+    }
+
+    protected clearDialogs() {
+        this.setState({
+            displayAddDialog: false,
+            displayDeleteDialog: false,
+        });
+    }
+
+    public onWindowKeyDown(event: KeyboardEvent) {
+        switch (event.key) {
+            case 'Escape':
+                this.clearDialogs();
+                break;
+        }
     }
 
     private onAddClick(event: React.MouseEvent) {
         event.preventDefault();
+
+        if (!this.state.allowAdd || this.state.isLoading || this.state.isLoadingList) {
+            return;
+        }
 
         this.setState({
             displayAddDialog: true,
@@ -123,6 +186,24 @@ class ListContent extends React.Component<IProps, IState> {
 
     public componentDidMount() {
         this.load();
+
+        window.addEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
+    }
+
+    public onChangeTranslation(translation: ITranslation) {
+        this.setState({
+            selectedTranslation: translation,
+        });
+    }
+
+    public onChangeBook(book: IBook, chapterId: number, verse: IVerse) {
+        this.setState({
+            verseToAdd: verse,
+        });
     }
 
     public render(): JSX.Element {
@@ -134,7 +215,7 @@ class ListContent extends React.Component<IProps, IState> {
 
                         <button
                             className="btn btn-secondary btn-sm pull pull-right"
-                            disabled={!this.state.allowAdd}
+                            disabled={!this.state.allowAdd || this.state.isLoading || this.state.isLoadingList}
                             onClick={(event: React.MouseEvent) => this.onAddClick(event)}
                         >
                             Add Verse
@@ -191,13 +272,68 @@ class ListContent extends React.Component<IProps, IState> {
 
                 <div className="overlay" style={{ display: this.state.displayAddDialog ? 'block' : 'none' }}>
                     <div className="dialog">
-                        Add verse form here...
-                        {/*<add-verse-form list-id="vm.listId"></add-verse-form>*/}
+                        <FormError
+                            hasError={this.state.addError.hasError}
+                            errorDescription={this.state.addError.errorDescription}
+                            errors={this.state.addError.errors}
+                        />
+
+                        <div className="card">
+                            <div className="card-header">Add Verse</div>
+                            <div className="card-body">
+                                <TranslationSelector
+                                    selectedTranslation={this.state.selectedTranslation}
+                                    onChange={(translation: ITranslation) => this.onChangeTranslation(translation)}
+                                ></TranslationSelector>
+
+                                <div className="mt-3 mb-3">
+                                    <b>
+                                        {this.state.verseToAdd.book.name.toUpperCase()}{' '}
+                                        {this.state.verseToAdd.chapterId}:{this.state.verseToAdd.verseId}
+                                    </b>
+                                    &nbsp;
+                                    {this.state.verseToAdd.verse}
+                                </div>
+
+                                <BookSelector
+                                    selectedTranslation={this.state.selectedTranslation}
+                                    selectedBook={this.state.selectedBookId}
+                                    selectedChapter={this.state.selectedChapterId}
+                                    selectedVerse={this.state.selectedVerseId}
+                                    showVerses={true}
+                                    showNavButtons={false}
+                                    onChange={(book: IBook, chapterId: number, verse: IVerse) =>
+                                        this.onChangeBook(book, chapterId, verse)
+                                    }
+                                />
+                            </div>
+                            <div className="card-footer text-right">
+                                <button
+                                    className="btn btn-default mr-2"
+                                    onClick={() => this.setState({ displayAddDialog: false })}
+                                >
+                                    No
+                                </button>
+                                <button
+                                    className="btn btn-primary"
+                                    disabled={this.state.isLoading}
+                                    onClick={() => alert('adding')}
+                                >
+                                    Yes
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div className="overlay" style={{ display: this.state.displayDeleteDialog ? 'block' : 'none' }}>
                     <div className="dialog">
+                        <FormError
+                            hasError={this.state.deleteError.hasError}
+                            errorDescription={this.state.deleteError.errorDescription}
+                            errors={this.state.deleteError.errors}
+                        />
+
                         <div className="card">
                             <div className="card-header">Remove Verse</div>
                             <div className="card-body">
@@ -210,7 +346,7 @@ class ListContent extends React.Component<IProps, IState> {
                             </div>
                             <div className="card-footer text-right">
                                 <button
-                                    className="btn btn-default"
+                                    className="btn btn-default mr-2"
                                     onClick={() => this.setState({ displayDeleteDialog: false })}
                                 >
                                     No

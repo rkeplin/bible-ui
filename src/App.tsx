@@ -355,10 +355,14 @@ class App extends React.Component<RouteComponentProps, IState> {
 
                         <h4 className="mt-4 mb-3">Jump To Book</h4>
                         <BookSelector
+                            selectedTranslation={this.state.translation}
                             selectedBook={this.state.book.id}
                             selectedChapter={this.state.chapterId}
-                            onChange={(book: IBook, chapterId: number, verseId: number) =>
-                                this.onChangeBook(book, chapterId, verseId)
+                            selectedVerse={1}
+                            showVerses={false}
+                            showNavButtons={true}
+                            onChange={(book: IBook, chapterId: number, verse: IVerse) =>
+                                this.onChangeBook(book, chapterId, 0)
                             }
                         />
                     </div>

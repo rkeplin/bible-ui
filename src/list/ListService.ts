@@ -10,6 +10,24 @@ export interface IList {
     dateUpdated?: string;
 }
 
+interface IID {
+    id: string;
+}
+
+interface IUser {
+    id: string;
+    email: string;
+}
+
+export interface IListVerse {
+    dateAdded: string;
+    id: string;
+    list: IID;
+    text: IVerse;
+    translation: string;
+    user: IUser;
+}
+
 class ListService extends HttpService {
     constructor() {
         super(Config.USER_API);
@@ -70,7 +88,7 @@ class ListService extends HttpService {
             });
     }
 
-    public getVerses(listId: string): Promise<IVerse[]> {
+    public getVerses(listId: string): Promise<IListVerse[]> {
         return this.httpClient
             .get('lists/' + listId + '/verses', { withCredentials: true })
             .then((response: AxiosResponse) => {
@@ -81,9 +99,11 @@ class ListService extends HttpService {
             });
     }
 
-    public addVerse(listId: string, verseId: string, translation: string) {
+    public addVerse(listId: string, verseId: number, translation: string) {
         return this.httpClient
-            .put('lists/' + listId + '/verses/' + verseId + '?translation=' + translation, { withCredentials: true })
+            .put('lists/' + listId + '/verses/' + verseId + '?translation=' + translation, null, {
+                withCredentials: true,
+            })
             .then((response: AxiosResponse) => {
                 return response.data;
             })
@@ -92,7 +112,7 @@ class ListService extends HttpService {
             });
     }
 
-    public removeVerse(listId: string, verseId: string, translation: string) {
+    public removeVerse(listId: string, verseId: number, translation: string) {
         return this.httpClient
             .delete('lists/' + listId + '/verses/' + verseId + '?translation=' + translation, { withCredentials: true })
             .then((response: AxiosResponse) => {

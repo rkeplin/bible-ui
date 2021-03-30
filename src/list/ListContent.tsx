@@ -1,6 +1,6 @@
 import React from 'react';
 import { RouteComponentProps, withRouter, match } from 'react-router-dom';
-import ListService, { IList } from './ListService';
+import ListService, { IList, IListVerse } from './ListService';
 import IVerse from '../book/IVerse';
 import { AxiosError } from 'axios';
 import TranslationSelector from '../book/TranslationSelector';
@@ -15,8 +15,8 @@ interface IState {
     isLoadingList: boolean;
     isLoading: boolean;
     list: IList;
-    verses: IVerse[];
-    selectedVerse: IVerse;
+    verseList: IListVerse[];
+    selectedVerse: IListVerse;
     allowAdd: boolean;
     displayAddDialog: boolean;
     displayDeleteDialog: boolean;
@@ -63,18 +63,30 @@ class ListContent extends React.Component<IProps, IState> {
                 dateUpdated: '',
             },
             selectedVerse: {
-                book: {
-                    id: 0,
-                    testament: '',
-                    name: '',
+                dateAdded: '',
+                id: '',
+                list: {
+                    id: '',
                 },
-                chapterId: 0,
-                id: 0,
-                verse: '',
-                verseId: 0,
-                highlight: false,
+                text: {
+                    id: 0,
+                    book: {
+                        id: 0,
+                        testament: '',
+                        name: '',
+                    },
+                    chapterId: 0,
+                    verse: '',
+                    verseId: 0,
+                    highlight: false,
+                },
+                translation: '',
+                user: {
+                    id: '',
+                    email: '',
+                },
             },
-            verses: [],
+            verseList: [],
             allowAdd: true,
             displayAddDialog: false,
             displayDeleteDialog: false,
@@ -82,18 +94,7 @@ class ListContent extends React.Component<IProps, IState> {
             selectedBookId: 1,
             selectedChapterId: 1,
             selectedVerseId: 1,
-            verseToAdd: {
-                book: {
-                    id: 1,
-                    testament: 'OT',
-                    name: 'Genesis',
-                },
-                chapterId: 1,
-                id: 1001001,
-                verse: 'In the beginning God created the heaven and the earth.',
-                verseId: 1,
-                highlight: false,
-            },
+            verseToAdd: this.initVerse(),
             addError: {
                 hasError: false,
                 errorDescription: '',
@@ -107,8 +108,33 @@ class ListContent extends React.Component<IProps, IState> {
         };
     }
 
+    protected initVerse(): IVerse {
+        return {
+            book: {
+                id: 1,
+                testament: 'OT',
+                name: 'Genesis',
+            },
+            chapterId: 1,
+            id: 1001001,
+            verse: 'In the beginning God created the heaven and the earth.',
+            verseId: 1,
+            highlight: false,
+        };
+    }
+
     protected clearDialogs() {
         this.setState({
+            addError: {
+                hasError: false,
+                errorDescription: '',
+                errors: [],
+            },
+            deleteError: {
+                hasError: false,
+                errorDescription: '',
+                errors: [],
+            },
             displayAddDialog: false,
             displayDeleteDialog: false,
         });
@@ -134,17 +160,27 @@ class ListContent extends React.Component<IProps, IState> {
         });
     }
 
-    private onDeleteClick(event: React.MouseEvent, verse: IVerse) {
+    private onDeleteClick(event: React.MouseEvent, listVerse: IListVerse) {
         event.preventDefault();
 
         this.setState({
-            selectedVerse: verse,
+            selectedVerse: listVerse,
             displayDeleteDialog: true,
         });
     }
 
-    private remove(verse: IVerse) {
-        console.log(verse);
+    private remove(listVerse: IListVerse) {
+        this.listService
+            .removeVerse(this.props.match.params.listId, listVerse.text.id, listVerse.translation)
+            .then(() => {
+                this.setState({
+                    displayDeleteDialog: false,
+                });
+            })
+            .then(() => this.load())
+            .catch((error: AxiosError) => {
+                this.handleError(error);
+            });
     }
 
     private load() {
@@ -165,14 +201,51 @@ class ListContent extends React.Component<IProps, IState> {
 
         this.listService
             .getVerses(this.props.match.params.listId)
-            .then((verses) => {
+            .then((verseList) => {
                 this.setState({
                     isLoadingList: false,
-                    verses: verses,
+                    verseList: verseList,
                 });
             })
             .catch((error: AxiosError) => {
                 this.handleError(error);
+            });
+    }
+
+    public addVerse() {
+        if (!this.state.verseToAdd.id) {
+            return;
+        }
+
+        if (!this.state.selectedTranslation.id) {
+            return;
+        }
+
+        this.listService
+            .addVerse(
+                this.props.match.params.listId,
+                this.state.verseToAdd.id,
+                this.state.selectedTranslation.abbreviation,
+            )
+            .then((verse) => {
+                this.setState({
+                    displayAddDialog: false,
+                    verseToAdd: this.initVerse(),
+                });
+            })
+            .then(() => this.load())
+            .catch((error: AxiosError) => {
+                this.handleError(error);
+
+                this.setState({
+                    addError: {
+                        hasError: true,
+                        errorDescription: error.response?.data?.description
+                            ? error.response?.data?.description
+                            : 'Error',
+                        errors: error.response?.data?.errors ? error.response?.data?.errors : [],
+                    },
+                });
             });
     }
 
@@ -224,7 +297,7 @@ class ListContent extends React.Component<IProps, IState> {
                     <div className="card-body">
                         <div
                             style={{
-                                display: !this.state.verses.length && !this.state.isLoadingList ? 'block' : 'none',
+                                display: !this.state.verseList.length && !this.state.isLoadingList ? 'block' : 'none',
                             }}
                         >
                             There are no verses on this list yet.{' '}
@@ -239,30 +312,38 @@ class ListContent extends React.Component<IProps, IState> {
 
                         <div style={{ display: this.state.isLoadingList ? 'block' : 'none' }}>Loading...</div>
 
-                        {this.state.verses.map((verse: IVerse, index: number) => {
+                        {this.state.verseList.map((listVerse: IListVerse, index: number) => {
+                            const url =
+                                `/book/` +
+                                listVerse.translation.toLowerCase() +
+                                `/` +
+                                listVerse.text.book.id +
+                                `/` +
+                                listVerse.text.chapterId +
+                                `?verseId=` +
+                                listVerse.text.verseId;
+
                             return (
                                 <div className="well bg-gray mb20 p15" key={index}>
                                     <p>
-                                        <b>{verse.book.name}</b> -{' '}
-                                        <i>
-                                            {verse.book.testament} ({verse.translation})
-                                        </i>
+                                        <b>{listVerse.text.book.name}</b> - <i>{listVerse.text.book.testament}</i>
                                         <a
                                             className="pull pull-right"
                                             title="Remove from list"
                                             href=""
-                                            onClick={(event: React.MouseEvent) => this.onDeleteClick(event, verse)}
+                                            onClick={(event: React.MouseEvent) => this.onDeleteClick(event, listVerse)}
                                         >
                                             [x]
                                         </a>
                                     </p>
                                     <p>
                                         <b>
-                                            <a href="">
-                                                {verse.chapterId}:{verse.verseId}
+                                            <a href={url}>
+                                                {listVerse.text.chapterId}:{listVerse.text.verseId}{' '}
+                                                <i>({listVerse.translation})</i>
                                             </a>
-                                        </b>
-                                        {verse.verse}
+                                        </b>{' '}
+                                        {listVerse.text.verse}
                                     </p>
                                 </div>
                             );
@@ -317,7 +398,7 @@ class ListContent extends React.Component<IProps, IState> {
                                 <button
                                     className="btn btn-primary"
                                     disabled={this.state.isLoading}
-                                    onClick={() => alert('adding')}
+                                    onClick={() => this.addVerse()}
                                 >
                                     Yes
                                 </button>
@@ -339,8 +420,8 @@ class ListContent extends React.Component<IProps, IState> {
                             <div className="card-body">
                                 Are you sure that you want to remove{' '}
                                 <b>
-                                    {this.state.selectedVerse.book.name} {this.state.selectedVerse.chapterId}:
-                                    {this.state.selectedVerse.verseId} ({this.state.selectedVerse.translation})
+                                    {this.state.selectedVerse.text.book.name} {this.state.selectedVerse.text.chapterId}:
+                                    {this.state.selectedVerse.text.verseId} ({this.state.selectedVerse.translation})
                                 </b>{' '}
                                 from this list?
                             </div>

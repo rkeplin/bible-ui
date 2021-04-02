@@ -405,10 +405,7 @@ class ListContent extends React.Component<IProps, IState> {
                                 />
                             </div>
                             <div className="card-footer text-right">
-                                <button
-                                    className="btn btn-default mr-2"
-                                    onClick={() => this.setState({ displayAddDialog: false })}
-                                >
+                                <button className="btn btn-default mr-2" onClick={() => this.clearDialogs()}>
                                     Cancel
                                 </button>
                                 <button
@@ -442,10 +439,7 @@ class ListContent extends React.Component<IProps, IState> {
                                 from this list?
                             </div>
                             <div className="card-footer text-right">
-                                <button
-                                    className="btn btn-default mr-2"
-                                    onClick={() => this.setState({ displayDeleteDialog: false })}
-                                >
+                                <button className="btn btn-default mr-2" onClick={() => this.clearDialogs()}>
                                     No
                                 </button>
                                 <button

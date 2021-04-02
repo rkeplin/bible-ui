@@ -5,6 +5,7 @@ import ListService, { IList } from './ListService';
 import FormError, { IFormError } from '../core/FormError';
 import { AxiosError } from 'axios';
 import moment from 'moment';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IState {
     isLoading: boolean;
@@ -280,52 +281,45 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                             {this.state.lists.map((list: IList, index: number) => {
                                 return (
                                     <div key={index} className="well bg-gray mb20 p15">
-                                        <button
-                                            type="button"
-                                            className="pull pull-right btn btn-success btn-sm dropdown-toggle"
-                                            data-toggle="dropdown"
-                                            aria-haspopup="true"
-                                            aria-expanded="false"
-                                        >
-                                            Action
-                                        </button>
-                                        <div className="dropdown-menu">
-                                            <a
-                                                className="dropdown-item"
-                                                href=""
-                                                onClick={(event: React.MouseEvent) =>
-                                                    this.onUpdateListClick(event, list)
-                                                }
-                                            >
-                                                Rename
-                                            </a>
-                                            <a
-                                                className="dropdown-item"
-                                                href=""
-                                                onClick={(event: React.MouseEvent) =>
-                                                    this.onDeleteListClick(event, list)
-                                                }
-                                            >
-                                                Delete
-                                            </a>
-                                        </div>
-
-                                        <p>
-                                            <b>Updated</b> - <i>{moment(list.dateUpdated).format('MMM Do, YYYY')}</i>
-                                        </p>
-
-                                        <p>
-                                            <a
-                                                href=""
+                                        <div className="pull pull-right">
+                                            <button
+                                                className="btn btn-primary btn-sm mr-1"
+                                                title="Manage Verses"
                                                 onClick={(event: React.MouseEvent) => {
                                                     event.preventDefault();
 
                                                     this.props.history.push('/list/' + list.id + '/verses');
                                                 }}
                                             >
+                                                <FontAwesomeIcon icon="list" />
+                                            </button>
+                                            <button
+                                                className="btn btn-primary btn-sm"
+                                                title="Remove List"
+                                                onClick={(event: React.MouseEvent) =>
+                                                    this.onDeleteListClick(event, list)
+                                                }
+                                            >
+                                                <FontAwesomeIcon icon="minus-circle" />
+                                            </button>
+                                        </div>
+
+                                        <p className="text-secondary">
+                                            <b>{moment(list.dateUpdated).format('MMM Do, YYYY')}</b> -{' '}
+                                            <i>Last Updated</i>
+                                        </p>
+
+                                        <h3 className="mr-2" style={{ display: 'inline-block' }}>
+                                            <a
+                                                href=""
+                                                title="Rename"
+                                                onClick={(event: React.MouseEvent) =>
+                                                    this.onUpdateListClick(event, list)
+                                                }
+                                            >
                                                 {list.name}
                                             </a>
-                                        </p>
+                                        </h3>
                                     </div>
                                 );
                             })}
@@ -344,6 +338,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                                 <div className="card-header">Create List</div>
                                 <div className="card-body">
                                     <input
+                                        id="input_add"
                                         name="name"
                                         className="form-control"
                                         value={this.state.list.name}
@@ -391,6 +386,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                                 <div className="card-header">Rename List</div>
                                 <div className="card-body">
                                     <input
+                                        id="input_rename"
                                         name="name"
                                         className="form-control"
                                         value={this.state.list.name}

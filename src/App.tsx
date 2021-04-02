@@ -18,6 +18,10 @@ import Logout from './user/Logout';
 import ManageLists from './list/ManageLists';
 import ListContent from './list/ListContent';
 import UserService, { IUser } from './user/UserService';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faEdit, faList, faMinusCircle } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faEdit, faList, faMinusCircle);
 
 interface ISearch {
     isLoading: boolean;

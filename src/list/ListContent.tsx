@@ -10,6 +10,7 @@ import BookSelector from '../book/BookSelector';
 import IBook from '../book/IBook';
 import BookService from '../book/BookService';
 import FormError, { IFormError } from '../core/FormError';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IState {
     isLoadingList: boolean;
@@ -284,8 +285,17 @@ class ListContent extends React.Component<IProps, IState> {
             <div>
                 <div className="card">
                     <div className="card-header">
-                        {this.state.list.name || 'Loading...'}
+                        <a
+                            href=""
+                            onClick={(event: React.MouseEvent) => {
+                                event.preventDefault();
 
+                                this.props.history.push('/list');
+                            }}
+                        >
+                            Lists
+                        </a>{' '}
+                        &raquo; {this.state.list.name || 'Loading...'}
                         <button
                             className="btn btn-secondary btn-sm pull pull-right"
                             disabled={!this.state.allowAdd || this.state.isLoading || this.state.isLoadingList}
@@ -327,18 +337,24 @@ class ListContent extends React.Component<IProps, IState> {
                                 <div className="well bg-gray mb20 p15" key={index}>
                                     <p>
                                         <b>{listVerse.text.book.name}</b> - <i>{listVerse.text.book.testament}</i>
-                                        <a
-                                            className="pull pull-right"
+                                        <button
+                                            className="btn btn-primary btn-sm pull pull-right"
                                             title="Remove from list"
-                                            href=""
                                             onClick={(event: React.MouseEvent) => this.onDeleteClick(event, listVerse)}
                                         >
-                                            [x]
-                                        </a>
+                                            <FontAwesomeIcon icon="minus-circle" />
+                                        </button>
                                     </p>
                                     <p>
                                         <b>
-                                            <a href={url}>
+                                            <a
+                                                href=""
+                                                onClick={(event: React.MouseEvent) => {
+                                                    event.preventDefault();
+
+                                                    this.props.history.push(url);
+                                                }}
+                                            >
                                                 {listVerse.text.chapterId}:{listVerse.text.verseId}{' '}
                                                 <i>({listVerse.translation})</i>
                                             </a>
@@ -393,14 +409,14 @@ class ListContent extends React.Component<IProps, IState> {
                                     className="btn btn-default mr-2"
                                     onClick={() => this.setState({ displayAddDialog: false })}
                                 >
-                                    No
+                                    Cancel
                                 </button>
                                 <button
                                     className="btn btn-primary"
                                     disabled={this.state.isLoading}
                                     onClick={() => this.addVerse()}
                                 >
-                                    Yes
+                                    Add
                                 </button>
                             </div>
                         </div>

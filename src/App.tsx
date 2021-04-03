@@ -4,20 +4,17 @@ import BookSelector from './book/BookSelector';
 import KeywordSearch from './book/KeywordSearch';
 import UserMenu from './user/UserMenu';
 import TextDisplay from './book/TextDisplay';
-import IBook from './book/IBook';
-import ITranslation from './book/ITranslation';
-import { Switch, Route, Link, Redirect, withRouter, RouteComponentProps } from 'react-router-dom';
+import { Switch, Route, Redirect, withRouter, RouteComponentProps } from 'react-router-dom';
 import URLParser from './book/URLParser';
-import BookService from './book/BookService';
+import BookService, { IBook, ITranslation, IVerse } from './book/BookService';
 import TranslationService from './book/TranslationService';
 import SearchResults from './search/SearchResults';
-import IVerse from './book/IVerse';
 import LoginForm from './user/LoginForm';
 import RegistrationForm from './user/RegistrationForm';
 import Logout from './user/Logout';
 import ManageLists from './list/ManageLists';
 import ListContent from './list/ListContent';
-import UserService, { IUser } from './user/UserService';
+import UserService from './user/UserService';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEdit, faList, faMinusCircle } from '@fortawesome/free-solid-svg-icons';
 
@@ -88,7 +85,7 @@ class App extends React.Component<RouteComponentProps, IState> {
         };
     }
 
-    init(pathname: string, search: string) {
+    protected init(pathname: string, search: string) {
         if (pathname.startsWith('/user/login')) {
             this.setState({
                 title: 'User',
@@ -185,14 +182,14 @@ class App extends React.Component<RouteComponentProps, IState> {
         }
     }
 
-    toggleNav() {
+    protected toggleNav() {
         this.setState({
             isNavOpen: !this.state.isNavOpen,
             tmpIsNavOpen: !this.state.isNavOpen,
         });
     }
 
-    onChangeTranslation(translation: ITranslation) {
+    protected onChangeTranslation(translation: ITranslation) {
         const parser = new URLParser(this.props.location.pathname, this.props.location.search);
 
         if (parser.isSearchURL()) {
@@ -215,13 +212,13 @@ class App extends React.Component<RouteComponentProps, IState> {
         }
     }
 
-    onLogin() {
+    protected onLogin() {
         this.setState({
             loggedIn: true,
         });
     }
 
-    componentDidMount() {
+    public componentDidMount() {
         this.init(this.props.location.pathname, this.props.location.search);
 
         this.unlisten = this.props.history.listen((location) => {
@@ -238,11 +235,11 @@ class App extends React.Component<RouteComponentProps, IState> {
             });
     }
 
-    componentWillUnmount() {
+    public componentWillUnmount() {
         this.unlisten();
     }
 
-    onChangeBook(book: IBook, chapterId: number, verseId: number) {
+    protected onChangeBook(book: IBook, chapterId: number, verseId: number) {
         const parser = new URLParser(this.props.location.pathname, this.props.location.search);
 
         if (!parser.isBookURL() && !this.state.isNavOpen) {
@@ -271,13 +268,13 @@ class App extends React.Component<RouteComponentProps, IState> {
         );
     }
 
-    onSearch(search: string) {
+    protected onSearch(search: string) {
         window.scrollTo(0, 0);
 
         this.history.push('/search/' + this.state.translation.abbreviation.toLowerCase() + '?query=' + search);
     }
 
-    onChangeTitle(title: string, subTitle: string) {
+    protected onChangeTitle(title: string, subTitle: string) {
         this.setState({
             title: title,
             subTitle: subTitle,
@@ -286,7 +283,7 @@ class App extends React.Component<RouteComponentProps, IState> {
         return;
     }
 
-    toggleCrossRefModal(selectedVerse: IVerse | undefined, open: boolean) {
+    protected toggleCrossRefModal(selectedVerse: IVerse | undefined, open: boolean) {
         let verseId = 0;
 
         if (selectedVerse?.verseId) {
@@ -308,7 +305,7 @@ class App extends React.Component<RouteComponentProps, IState> {
         });
     }
 
-    render(): JSX.Element {
+    public render(): JSX.Element {
         return (
             <div>
                 <div id="topnav" className={`${this.state.isNavOpen ? 'nav-open' : ''}`}>

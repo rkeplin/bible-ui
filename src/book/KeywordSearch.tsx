@@ -18,7 +18,7 @@ class KeywordSearch extends React.Component<IProps, IState> {
         };
     }
 
-    search() {
+    protected search() {
         if (this.state.search.length < 1) {
             return;
         }
@@ -38,7 +38,7 @@ class KeywordSearch extends React.Component<IProps, IState> {
         }
     }
 
-    handleKeyPress(event: any /* React.KeyboardEvent<HTMLInputElement> */) {
+    protected handleKeyPress(event: any /* React.KeyboardEvent<HTMLInputElement> */) {
         if (event.key.toUpperCase() !== 'ENTER') {
             return;
         }
@@ -50,7 +50,7 @@ class KeywordSearch extends React.Component<IProps, IState> {
         this.search();
     }
 
-    handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    protected handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         this.setState({
             search: event.target.value,
         });

@@ -1,10 +1,5 @@
 import React from 'react';
-import IBook from './IBook';
-import IChapter from './IChapter';
-import BookService from './BookService';
-import IVerse from './IVerse';
-import TranslationService from './TranslationService';
-import ITranslation from './ITranslation';
+import BookService, { IBook, IChapter, ITranslation, IVerse } from './BookService';
 
 interface IState {
     selectedBook: number;
@@ -49,7 +44,7 @@ class BookSelector extends React.Component<IProps, IState> {
         };
     }
 
-    private handleKeyDown(event: KeyboardEvent) {
+    protected handleKeyDown(event: KeyboardEvent) {
         // TODO: Only do this when the user is on the book page
 
         if (this.state.isLoadingBooks || this.state.isLoadingChapters || this.state.isLoadingVerses) {
@@ -115,7 +110,7 @@ class BookSelector extends React.Component<IProps, IState> {
             .then(() => this.getVerses(this.state.selectedBook, this.state.selectedChapter));
     }
 
-    private getChapters(bookId: number) {
+    protected getChapters(bookId: number) {
         const service = new BookService();
 
         return service.getChapters(bookId).then(
@@ -134,7 +129,7 @@ class BookSelector extends React.Component<IProps, IState> {
         );
     }
 
-    private getVerses(bookId: number, chapterId: number) {
+    protected getVerses(bookId: number, chapterId: number) {
         const service = new BookService();
 
         return service.getText(bookId, chapterId, this.props.selectedTranslation.abbreviation).then(
@@ -159,13 +154,13 @@ class BookSelector extends React.Component<IProps, IState> {
         );
     }
 
-    private onChangeBook = (event: React.FormEvent<HTMLSelectElement>) => {
+    protected onChangeBook = (event: React.FormEvent<HTMLSelectElement>) => {
         const newBook = parseInt(event.currentTarget.value);
 
         this.changeBook(newBook, 1);
     };
 
-    private changeBook(newBook: number, newChapter: number) {
+    protected changeBook(newBook: number, newChapter: number) {
         this.setState({
             isLoadingBooks: true,
             isLoadingChapters: true,
@@ -187,15 +182,15 @@ class BookSelector extends React.Component<IProps, IState> {
             });
     }
 
-    private disablePrev(chapter: number): boolean {
+    protected disablePrev(chapter: number): boolean {
         return this.state.selectedBook === 1 && chapter === 1;
     }
 
-    private disableNext(chapter: number): boolean {
+    protected disableNext(chapter: number): boolean {
         return this.state.selectedBook === 66 && chapter === 22;
     }
 
-    private onChangeChapter = (event: React.FormEvent<HTMLSelectElement>) => {
+    protected onChangeChapter = (event: React.FormEvent<HTMLSelectElement>) => {
         const newChapter = parseInt(event.currentTarget.value);
 
         this.getVerses(this.state.selectedBook, newChapter).then(() => {
@@ -210,7 +205,7 @@ class BookSelector extends React.Component<IProps, IState> {
         });
     };
 
-    private onChangeVerse = (event: React.FormEvent<HTMLSelectElement>) => {
+    protected onChangeVerse = (event: React.FormEvent<HTMLSelectElement>) => {
         const newVerse = parseInt(event.currentTarget.value);
 
         this.setState({
@@ -220,7 +215,7 @@ class BookSelector extends React.Component<IProps, IState> {
         this.emit(this.state.selectedBook, this.state.selectedChapter, newVerse);
     };
 
-    private next() {
+    protected next() {
         if (!this.props.showNavButtons) {
             return;
         }
@@ -246,7 +241,7 @@ class BookSelector extends React.Component<IProps, IState> {
         this.emit(this.state.selectedBook, newChapter, 1);
     }
 
-    private emit(bookId: number, chapterId: number, verseId: number) {
+    protected emit(bookId: number, chapterId: number, verseId: number) {
         let bookIndex = 0;
         let verseIndex = 0;
 
@@ -267,7 +262,7 @@ class BookSelector extends React.Component<IProps, IState> {
         this.props.onChange(this.state.books[bookIndex], chapterId, this.state.verses[verseIndex]);
     }
 
-    private previous() {
+    protected previous() {
         if (!this.props.showNavButtons) {
             return;
         }

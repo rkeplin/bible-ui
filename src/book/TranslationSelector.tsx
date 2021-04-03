@@ -1,6 +1,6 @@
 import React from 'react';
-import ITranslation from './ITranslation';
 import TranslationService from './TranslationService';
+import { ITranslation } from './BookService';
 
 interface IProps {
     selectedTranslation: ITranslation;
@@ -49,7 +49,7 @@ class TranslationSelector extends React.Component<IProps, IState> {
         );
     }
 
-    private update(e: React.MouseEvent, selectedTranslation: ITranslation): void {
+    protected update(e: React.MouseEvent, selectedTranslation: ITranslation): void {
         e.preventDefault();
 
         this.setState({

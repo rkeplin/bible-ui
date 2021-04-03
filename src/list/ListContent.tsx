@@ -1,14 +1,11 @@
 import React from 'react';
 import { RouteComponentProps, withRouter, match } from 'react-router-dom';
 import ListService, { IList, IListVerse } from './ListService';
-import IVerse from '../book/IVerse';
 import { AxiosError } from 'axios';
 import TranslationSelector from '../book/TranslationSelector';
-import ITranslation from '../book/ITranslation';
 import TranslationService from '../book/TranslationService';
 import BookSelector from '../book/BookSelector';
-import IBook from '../book/IBook';
-import BookService from '../book/BookService';
+import BookService, { IBook, ITranslation, IVerse } from '../book/BookService';
 import FormError, { IFormError } from '../core/FormError';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -141,7 +138,7 @@ class ListContent extends React.Component<IProps, IState> {
         });
     }
 
-    public onWindowKeyDown(event: KeyboardEvent) {
+    protected onWindowKeyDown(event: KeyboardEvent) {
         switch (event.key) {
             case 'Escape':
                 this.clearDialogs();
@@ -149,7 +146,7 @@ class ListContent extends React.Component<IProps, IState> {
         }
     }
 
-    private onAddClick(event: React.MouseEvent) {
+    protected onAddClick(event: React.MouseEvent) {
         event.preventDefault();
 
         if (!this.state.allowAdd || this.state.isLoading || this.state.isLoadingList) {
@@ -161,7 +158,7 @@ class ListContent extends React.Component<IProps, IState> {
         });
     }
 
-    private onDeleteClick(event: React.MouseEvent, listVerse: IListVerse) {
+    protected onDeleteClick(event: React.MouseEvent, listVerse: IListVerse) {
         event.preventDefault();
 
         this.setState({
@@ -170,7 +167,7 @@ class ListContent extends React.Component<IProps, IState> {
         });
     }
 
-    private remove(listVerse: IListVerse) {
+    protected remove(listVerse: IListVerse) {
         this.listService
             .removeVerse(this.props.match.params.listId, listVerse.text.id, listVerse.translation)
             .then(() => {
@@ -184,7 +181,7 @@ class ListContent extends React.Component<IProps, IState> {
             });
     }
 
-    private load() {
+    protected load() {
         this.setState({
             isLoadingList: true,
         });
@@ -213,7 +210,7 @@ class ListContent extends React.Component<IProps, IState> {
             });
     }
 
-    public addVerse() {
+    protected addVerse() {
         if (!this.state.verseToAdd.id) {
             return;
         }
@@ -250,7 +247,7 @@ class ListContent extends React.Component<IProps, IState> {
             });
     }
 
-    public handleError(error: AxiosError) {
+    protected handleError(error: AxiosError) {
         if (error.response?.status === 401) {
             this.props.history.push('/user/login');
 
@@ -268,13 +265,13 @@ class ListContent extends React.Component<IProps, IState> {
         window.removeEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
     }
 
-    public onChangeTranslation(translation: ITranslation) {
+    protected onChangeTranslation(translation: ITranslation) {
         this.setState({
             selectedTranslation: translation,
         });
     }
 
-    public onChangeBook(book: IBook, chapterId: number, verse: IVerse) {
+    protected onChangeBook(book: IBook, chapterId: number, verse: IVerse) {
         this.setState({
             verseToAdd: verse,
         });

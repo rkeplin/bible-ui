@@ -1,7 +1,6 @@
 import React from 'react';
-import IVerse from './IVerse';
-import ITranslation from './ITranslation';
-import BookService from './BookService';
+import BookService, { ITranslation, IVerse } from './BookService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IProps {
     open: boolean;
@@ -36,13 +35,13 @@ class CrossReference extends React.Component<IProps, IState> {
         };
     }
 
-    onClose(event: React.MouseEvent) {
+    protected onClose(event: React.MouseEvent) {
         event.preventDefault();
 
         this.close();
     }
 
-    close() {
+    protected close() {
         this.setState({
             style: {
                 display: 'none',
@@ -52,7 +51,7 @@ class CrossReference extends React.Component<IProps, IState> {
         this.props.toggleModal(false);
     }
 
-    private load() {
+    protected load() {
         this.setState({
             isLoading: true,
             relatedVerses: [],
@@ -86,7 +85,7 @@ class CrossReference extends React.Component<IProps, IState> {
         this.props.toggleModal(true);
     }
 
-    private handleKeyDown(event: KeyboardEvent) {
+    protected handleKeyDown(event: KeyboardEvent) {
         switch (event.key) {
             case 'Escape':
                 this.close();
@@ -137,9 +136,13 @@ class CrossReference extends React.Component<IProps, IState> {
                         Found {this.state.relatedVerses.length} Cross References
                     </i>
                     <span className="pull-right">
-                        <a href="#" onClick={(event: React.MouseEvent) => this.onClose(event)}>
-                            [x] close
-                        </a>
+                        <button
+                            className="btn btn-primary btn-sm"
+                            title="Close"
+                            onClick={(event: React.MouseEvent) => this.onClose(event)}
+                        >
+                            <FontAwesomeIcon icon="minus-circle" /> Close
+                        </button>
                     </span>
                 </p>
 

@@ -1,4 +1,4 @@
-import IVerse from '../book/IVerse';
+import { IVerse } from '../book/BookService';
 
 interface ISearchResult {
     items: IVerse[];

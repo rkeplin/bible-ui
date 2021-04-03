@@ -1,10 +1,7 @@
 import React from 'react';
 import VerseDisplay from './VerseDisplay';
-import IBook from './IBook';
-import ITranslation from './ITranslation';
-import IVerse from './IVerse';
 import CrossReference from './CrossReference';
-import BookService from './BookService';
+import BookService, { IBook, ITranslation, IVerse } from './BookService';
 
 interface IProps {
     translation: ITranslation;
@@ -39,7 +36,7 @@ class TextDisplay extends React.Component<IProps, IState> {
         };
     }
 
-    private load() {
+    protected load() {
         const service = new BookService();
 
         service.getText(this.props.bookId, this.props.chapterId, this.props.translation.abbreviation).then(
@@ -103,7 +100,7 @@ class TextDisplay extends React.Component<IProps, IState> {
         this.load();
     }
 
-    public onDisplayCrossRefs(verse: IVerse, side: string) {
+    protected onDisplayCrossRefs(verse: IVerse, side: string) {
         this.setState({
             displayCrossRefs: true,
             crossRefSide: side,
@@ -111,7 +108,7 @@ class TextDisplay extends React.Component<IProps, IState> {
         });
     }
 
-    public toggleCrossRefModal(open: boolean) {
+    protected toggleCrossRefModal(open: boolean) {
         this.setState({
             displayCrossRefs: open,
         });

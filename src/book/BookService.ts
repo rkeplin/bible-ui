@@ -1,8 +1,31 @@
 import Config from '../Config';
 import HttpService from '../core/HttpService';
-import IBook from './IBook';
-import IChapter from './IChapter';
-import IVerse from './IVerse';
+
+export interface IBook {
+    id: number;
+    testament: string;
+    name: string;
+}
+
+export interface ITranslation {
+    abbreviation: string;
+    id: number;
+    version: string;
+}
+
+export interface IVerse {
+    book: IBook;
+    chapterId: number;
+    id: number;
+    verse: string;
+    verseId: number;
+    highlight: boolean;
+    translation?: string;
+}
+
+export interface IChapter {
+    id: number;
+}
 
 class BookService extends HttpService {
     protected bookCache: IBook;

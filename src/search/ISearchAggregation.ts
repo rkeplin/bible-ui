@@ -1,4 +1,4 @@
-import IBook from '../book/IBook';
+import { IBook } from '../book/BookService';
 
 interface ISearchAggregation {
     book: IBook;

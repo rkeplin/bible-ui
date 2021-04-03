@@ -12,7 +12,7 @@ class FormError extends React.Component<IProp, any> {
     public render(): JSX.Element {
         return (
             <div className="alert alert-danger" style={{ display: this.props.hasError ? 'block' : 'none' }}>
-                <p>
+                <p className={this.props.errors.length == 0 ? 'mb-0' : ''}>
                     <b>{this.props.errorDescription}</b>
                 </p>
                 <ul style={{ display: this.props.errors.length > 0 ? 'block' : 'none' }}>

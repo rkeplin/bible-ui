@@ -1,10 +1,9 @@
 import React from 'react';
 import SearchService from './SearchService';
 import ISearchResult from './ISearchResult';
-import IVerse from '../book/IVerse';
 import ISearchAggregation from './ISearchAggregation';
-import IBook from '../book/IBook';
 import SearchChart from './chart/SearchChart';
+import { IBook, IVerse } from '../book/BookService';
 
 interface IProps {
     isLoading: boolean;
@@ -45,7 +44,7 @@ class SearchResults extends React.Component<IProps, IState> {
         this.limit = 100;
     }
 
-    private load() {
+    protected load() {
         this.props.changeTitle('Loading...', '');
 
         const service = new SearchService();
@@ -84,7 +83,7 @@ class SearchResults extends React.Component<IProps, IState> {
             });
     }
 
-    private loadAggregate() {
+    protected loadAggregate() {
         const service = new SearchService();
 
         this.setState({
@@ -118,7 +117,7 @@ class SearchResults extends React.Component<IProps, IState> {
             });
     }
 
-    private loadMore(e: React.MouseEvent): void {
+    protected loadMore(e: React.MouseEvent): void {
         e.preventDefault();
 
         this.offset = this.offset + this.limit;
@@ -133,7 +132,7 @@ class SearchResults extends React.Component<IProps, IState> {
         this.searchChart = new SearchChart('graph');
     }
 
-    public onVerseClick(e: React.MouseEvent, verse: IVerse) {
+    protected onVerseClick(e: React.MouseEvent, verse: IVerse) {
         e.preventDefault();
 
         this.props.onChange(verse.book, verse.chapterId, verse.verseId);

@@ -60,7 +60,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
         };
     }
 
-    public onWindowKeyDown(event: KeyboardEvent) {
+    protected onWindowKeyDown(event: KeyboardEvent) {
         switch (event.key) {
             case 'Escape':
                 this.clearDialogs();
@@ -68,7 +68,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
         }
     }
 
-    public handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>, callback: () => void) {
+    protected handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>, callback: () => void) {
         switch (event.key) {
             case 'Enter':
                 callback();
@@ -104,7 +104,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
         });
     }
 
-    public load() {
+    protected load() {
         this.listService.getAll().then((lists) => {
             this.setState({
                 isLoading: false,
@@ -132,7 +132,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
         window.removeEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
     }
 
-    public onAddListClick(event: React.MouseEvent) {
+    protected onAddListClick(event: React.MouseEvent) {
         event.preventDefault();
 
         this.setState({
@@ -140,7 +140,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
         });
     }
 
-    public onUpdateListClick(event: React.MouseEvent, list: IList) {
+    protected onUpdateListClick(event: React.MouseEvent, list: IList) {
         event.preventDefault();
 
         this.setState({
@@ -149,7 +149,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
         });
     }
 
-    public onDeleteListClick(event: React.MouseEvent, list: IList) {
+    protected onDeleteListClick(event: React.MouseEvent, list: IList) {
         event.preventDefault();
 
         this.setState({
@@ -158,7 +158,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
         });
     }
 
-    public async create(list: IList) {
+    protected async create(list: IList) {
         this.setState({
             isSaving: true,
         });
@@ -187,7 +187,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
             });
     }
 
-    public async update(list: IList) {
+    protected async update(list: IList) {
         this.setState({
             isSaving: true,
         });
@@ -216,7 +216,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
             });
     }
 
-    public async remove(list: IList) {
+    protected async remove(list: IList) {
         this.setState({
             isSaving: true,
         });

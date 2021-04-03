@@ -1,7 +1,7 @@
 import Config from '../Config';
 import HttpService from '../core/HttpService';
 import { AxiosResponse, AxiosError } from 'axios';
-import IVerse from '../book/IVerse';
+import { IVerse } from '../book/BookService';
 
 export interface IList {
     id: string;

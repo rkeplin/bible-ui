@@ -1,19 +1,5 @@
 import React from 'react';
-
-interface IVerse {
-    book: IBook;
-    chapterId: number;
-    id: number;
-    verse: string;
-    verseId: number;
-    highlight: boolean;
-}
-
-interface IBook {
-    id: number;
-    name: string;
-    testament: string;
-}
+import { IVerse } from './BookService';
 
 interface IProps {
     onDisplayCrossRefs: (verse: IVerse) => void;
@@ -29,7 +15,7 @@ class VerseDisplay extends React.Component<IProps, any> {
         };
     }
 
-    onDisplayCrossRefs(event: React.MouseEvent) {
+    protected onDisplayCrossRefs(event: React.MouseEvent) {
         event.preventDefault();
 
         this.props.onDisplayCrossRefs(this.props.verse);

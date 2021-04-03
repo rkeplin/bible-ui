@@ -1,6 +1,6 @@
 import Config from '../Config';
 import HttpService from '../core/HttpService';
-import ITranslation from './ITranslation';
+import { ITranslation } from './BookService';
 
 class TranslationService extends HttpService {
     protected translationCache: ITranslation;

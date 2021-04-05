@@ -20,8 +20,8 @@ after_success:
   - docker push $DOCKER_REPO_SLUG:$TRAVIS_BUILD_NUMBER
   - docker push $DOCKER_REPO_SLUG:latest
 
-deploy:
-  provider: script
-  script: bash $(pwd)/.deploy/deploy.sh
-  on:
-    branch: main
+#deploy:
+#  provider: script
+#  script: bash $(pwd)/.deploy/deploy.sh
+#  on:
+#    branch: main

@@ -24,4 +24,4 @@ after_success:
 #  provider: script
 #  script: bash $(pwd)/.deploy/deploy.sh
 #  on:
-#    branch: master
+#    branch: main

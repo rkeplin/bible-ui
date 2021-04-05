@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/rkeplin/bible-ui.svg?branch=master)](https://travis-ci.com/rkeplin/bible-ui)
+
 # To get dev env going
 Make sure docker is running, yarn is installed and `/etc/hosts`  has appropriate entries.  Yarn is running outside of the docker-compose setup.  See `docker-compose.yml`
 * `make dev`

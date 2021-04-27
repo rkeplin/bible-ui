@@ -14,4 +14,6 @@ RUN yarn run build
 # Serve it
 FROM nginx:1.19.6
 
+COPY .docker/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=build /app/build /usr/share/nginx/html

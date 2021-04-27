@@ -14,11 +14,11 @@ before_install:
 script:
   - make build
 
-after_success:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  - docker build -t $DOCKER_REPO_SLUG:$TRAVIS_BUILD_NUMBER -t $DOCKER_REPO_SLUG:latest .
-  - docker push $DOCKER_REPO_SLUG:$TRAVIS_BUILD_NUMBER
-  - docker push $DOCKER_REPO_SLUG:latest
+#after_success:
+#  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+#  - docker build -t $DOCKER_REPO_SLUG:$TRAVIS_BUILD_NUMBER -t $DOCKER_REPO_SLUG:latest .
+#  - docker push $DOCKER_REPO_SLUG:$TRAVIS_BUILD_NUMBER
+#  - docker push $DOCKER_REPO_SLUG:latest
 
 #deploy:
 #  provider: script

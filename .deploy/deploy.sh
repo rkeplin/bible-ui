@@ -8,8 +8,6 @@ then
   exit 1
 fi
 
-exit 0
-
 # Get the latest commit hash
 GIT_COMMIT=$(git rev-parse --short HEAD)
 DOCKER_ID=rkeplin

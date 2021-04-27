@@ -28,6 +28,6 @@ prod:
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
 
 .PHONY: deploy
-prod:
+deploy:
 	@echo "=============🚀 Deploy 🚀============="
 	./.deploy/deploy.sh

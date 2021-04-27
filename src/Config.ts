@@ -1,5 +1,5 @@
-const API = 'http://bible-go-api.rkeplin.com/v1';
-const USER_API = 'http://bible-php-api.rkeplin.com/v1';
+const API = 'https://bible-go-api.rkeplin.com/v1';
+const USER_API = 'https://bible-php-api.rkeplin.com/v1';
 
 class Config {
     public static readonly API = process.env.REACT_APP_API_URL || API;

@@ -1,6 +1,6 @@
 .PHONY: dev
 dev:
-	@echo "=============🤓 Spin Up Dev Version 🤓============="
+	@echo "🤓 Spinning Up Dev Version"
 	docker-compose up
 
 .PHONY: pretty
@@ -9,25 +9,25 @@ pretty:
 
 .PHONY: down
 down:
-	@echo "=============💨 Taking Everything Down 💨============="
+	@echo "💨 Taking Everything Down"
 	docker-compose down --remove-orphans
 
 .PHONY: logs
 logs:
-	@echo "=============🔎 View Logs 🔎============="
+	@echo "🔎 Viewing Logs"
 	docker-compose logs -f
 
 .PHONY: build
 build:
-	@echo "=============🦾 Build Prod 🦾============="
+	@echo "🦾 Build Prod"
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
 
 .PHONY: prod
 prod:
-	@echo "=============🥳 Spin Up Prod Version 🥳============="
+	@echo "🥳 Spinning Up Version For Prod"
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
 
 .PHONY: deploy
 deploy:
-	@echo "=============🚀 Deploy 🚀============="
+	@echo "🚀 Deploying 🚀"
 	./.deploy/deploy.sh

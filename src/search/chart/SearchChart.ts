@@ -1,5 +1,7 @@
-import Chart from 'chart.js';
+import { Chart, ChartConfiguration, BarController, BarElement, CategoryScale, LinearScale, Tooltip } from 'chart.js';
 import ISearchAggregation from '../ISearchAggregation';
+
+Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
 
 class SearchChart {
     protected chart: Chart;
@@ -27,7 +29,7 @@ class SearchChart {
         this.chart?.update();
     }
 
-    protected getOptions() {
+    protected getOptions() : ChartConfiguration {
         const labels: [] = [];
         const data: [] = [];
 
@@ -66,51 +68,46 @@ class SearchChart {
             },
             options: {
                 maintainAspectRatio: false,
-                legend: {
-                    display: false,
-                },
-                tooltips: {
-                    displayColors: false,
-                    xPadding: 15,
-                    yPadding: 15,
-                    backgroundColor: 'rgba(108, 117, 125, 1)',
-                    callbacks: {
-                        title: (tooltipItem: any) => {
-                            let testament = 'Old Testament';
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        displayColors: false,
+                        padding: 15,
+                        backgroundColor: 'rgba(108, 117, 125, 1)',
+                        callbacks: {
+                            title: (tooltipItem: any) => {
+                                let testament = 'Old Testament';
 
-                            if (tooltipItem[0]?.index) {
-                                testament = tooltipItem[0].index < 39 ? 'Old Testament' : 'New Testament';
-                            }
+                                if (tooltipItem[0]?.index) {
+                                    testament = tooltipItem[0].index < 39 ? 'Old Testament' : 'New Testament';
+                                }
 
-                            return tooltipItem[0].label + ' - ' + testament;
-                        },
-                        label: (tooltipItem: any) => {
-                            if (tooltipItem?.yLabel) {
-                                return tooltipItem.yLabel.toLocaleString() + ' Results';
-                            }
+                                return tooltipItem[0].label + ' - ' + testament;
+                            },
+                            label: (tooltipItem: any) => {
+                                if (tooltipItem?.yLabel) {
+                                    return tooltipItem.yLabel.toLocaleString() + ' Results';
+                                }
 
-                            return '0 Results';
+                                return '0 Results';
+                            },
                         },
                     },
                 },
                 scales: {
-                    xAxes: [
-                        {
-                            gridLines: {
-                                display: false,
-                            },
-                            ticks: {
-                                display: false,
-                            },
+                    x: {
+                        grid: {
+                            display: false,
                         },
-                    ],
-                    yAxes: [
-                        {
-                            ticks: {
-                                beginAtZero: true,
-                            },
+                        ticks: {
+                            display: false,
                         },
-                    ],
+                    },
+                    y: {
+                        beginAtZero: true,
+                    },
                 },
             },
         };

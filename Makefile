@@ -26,3 +26,8 @@ build:
 prod:
 	@echo "============= Spin Up Prod Version ============="
 	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+.PHONY: deploy
+prod:
+	@echo "=============🚀 Deploy 🚀============="
+	./.deploy/deploy.sh

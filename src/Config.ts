@@ -6,6 +6,4 @@ class Config {
     public static readonly USER_API = process.env.REACT_APP_USER_API_URL || USER_API;
 }
 
-console.log(Config.API);
-
 export default Config;

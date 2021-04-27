@@ -1,9 +1,21 @@
 #!/bin/bash
-openssl aes-256-cbc -K $encrypted_a1bce9ed3c0f_key -iv $encrypted_a1bce9ed3c0f_iv -in $(pwd)/.deploy/travis_id_rsa.enc -out $(pwd)/.deploy/travis_id_rsa -d
+# Build the latest image
+sed -i "" -E 's/local/com/g' .env.local
+make build
+sed -i "" -E 's/com/local/g' .env.local
 
-chmod 0400 $(pwd)/.deploy/travis_id_rsa
+# Get the latest commit hash
+GIT_COMMIT=$(git rev-parse --short HEAD)
+DOCKER_ID=rkeplin
+DOCKER_REPO_SLUG=rkeplin/bible-react-ui
 
-ssh -t -oStrictHostKeyChecking=no -i $(pwd)/.deploy/travis_id_rsa travis@jersey1.rkeplin.com 'sed -i "s/image: rkeplin\/bible-react-ui:[a-zA-Z0-9]*/image: rkeplin\/bible-react-ui:'"$TRAVIS_BUILD_NUMBER"'/g" /opt/stacks/bible.yml'
-ssh -t -oStrictHostKeyChecking=no -i $(pwd)/.deploy/travis_id_rsa travis@jersey1.rkeplin.com 'docker stack deploy -c /opt/stacks/bible.yml bible'
+# Push image, tagging most recent git commit and latest
+docker login -u "$DOCKER_ID" --password-stdin
+docker build -t $DOCKER_REPO_SLUG:$GIT_COMMIT -t $DOCKER_REPO_SLUG:latest .
+docker push $DOCKER_REPO_SLUG:$GIT_COMMIT
+docker push $DOCKER_REPO_SLUG:latest
 
-rm -rf $(pwd)/.deploy/travis_id_rsa
+ssh -t -i ~/.ssh/id_rsa_rkeplin_sites_travis travis@jersey1.rkeplin.com 'sed -i "s/image: rkeplin\/bible-react-ui:[a-z0-9]*/image: rkeplin\/bible-react-ui:'"$GIT_COMMIT"'/g" /opt/stacks/bible.yml'
+ssh -t -i ~/.ssh/id_rsa_rkeplin_sites_travis travis@jersey1.rkeplin.com 'docker stack deploy -c /opt/stacks/bible.yml bible'
+
+docker logout

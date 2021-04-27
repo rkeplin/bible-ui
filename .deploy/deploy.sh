@@ -1,4 +1,7 @@
 #!/bin/bash
+# Get latest
+git pull
+
 # Get the latest commit hash
 GIT_COMMIT=$(git rev-parse --short HEAD)
 DOCKER_ID=rkeplin

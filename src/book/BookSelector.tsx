@@ -26,7 +26,7 @@ interface IProps {
 }
 
 class BookSelector extends React.Component<IProps, IState> {
-    constructor(props: any) {
+    constructor(props: IProps) {
         super(props);
 
         this.state = {
@@ -44,7 +44,7 @@ class BookSelector extends React.Component<IProps, IState> {
         };
     }
 
-    protected handleKeyDown(event: KeyboardEvent) {
+    protected handleKeyDown(event: KeyboardEvent): void {
         // TODO: Only do this when the user is on the book page
 
         if (this.state.isLoadingBooks || this.state.isLoadingChapters || this.state.isLoadingVerses) {
@@ -65,7 +65,7 @@ class BookSelector extends React.Component<IProps, IState> {
         }
     }
 
-    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any) {
+    public componentDidUpdate(prevProps: Readonly<IProps>): void {
         if (prevProps.selectedTranslation.abbreviation !== this.props.selectedTranslation.abbreviation) {
             this.getVerses(this.state.selectedBook, this.state.selectedChapter).then(() => {
                 this.emit(this.state.selectedBook, this.state.selectedChapter, this.state.selectedVerse);
@@ -73,11 +73,11 @@ class BookSelector extends React.Component<IProps, IState> {
         }
     }
 
-    public componentWillUnmount() {
+    public componentWillUnmount(): void {
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
     }
 
-    public componentDidMount() {
+    public componentDidMount(): void {
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
 
         this.setState({
@@ -110,7 +110,7 @@ class BookSelector extends React.Component<IProps, IState> {
             .then(() => this.getVerses(this.state.selectedBook, this.state.selectedChapter));
     }
 
-    protected getChapters(bookId: number) {
+    protected getChapters(bookId: number): Promise<void> {
         const service = new BookService();
 
         return service.getChapters(bookId).then(
@@ -129,7 +129,7 @@ class BookSelector extends React.Component<IProps, IState> {
         );
     }
 
-    protected getVerses(bookId: number, chapterId: number) {
+    protected getVerses(bookId: number, chapterId: number): Promise<void> {
         const service = new BookService();
 
         return service.getText(bookId, chapterId, this.props.selectedTranslation.abbreviation).then(
@@ -154,13 +154,13 @@ class BookSelector extends React.Component<IProps, IState> {
         );
     }
 
-    protected onChangeBook = (event: React.FormEvent<HTMLSelectElement>) => {
+    protected onChangeBook = (event: React.FormEvent<HTMLSelectElement>): void => {
         const newBook = parseInt(event.currentTarget.value);
 
         this.changeBook(newBook, 1);
     };
 
-    protected changeBook(newBook: number, newChapter: number) {
+    protected changeBook(newBook: number, newChapter: number): void {
         this.setState({
             isLoadingBooks: true,
             isLoadingChapters: true,
@@ -190,7 +190,7 @@ class BookSelector extends React.Component<IProps, IState> {
         return this.state.selectedBook === 66 && chapter === 22;
     }
 
-    protected onChangeChapter = (event: React.FormEvent<HTMLSelectElement>) => {
+    protected onChangeChapter = (event: React.FormEvent<HTMLSelectElement>): void => {
         const newChapter = parseInt(event.currentTarget.value);
 
         this.getVerses(this.state.selectedBook, newChapter).then(() => {
@@ -205,7 +205,7 @@ class BookSelector extends React.Component<IProps, IState> {
         });
     };
 
-    protected onChangeVerse = (event: React.FormEvent<HTMLSelectElement>) => {
+    protected onChangeVerse = (event: React.FormEvent<HTMLSelectElement>): void => {
         const newVerse = parseInt(event.currentTarget.value);
 
         this.setState({
@@ -215,7 +215,7 @@ class BookSelector extends React.Component<IProps, IState> {
         this.emit(this.state.selectedBook, this.state.selectedChapter, newVerse);
     };
 
-    protected next() {
+    protected next(): void {
         if (!this.props.showNavButtons) {
             return;
         }
@@ -241,7 +241,7 @@ class BookSelector extends React.Component<IProps, IState> {
         this.emit(this.state.selectedBook, newChapter, 1);
     }
 
-    protected emit(bookId: number, chapterId: number, verseId: number) {
+    protected emit(bookId: number, chapterId: number, verseId: number): void {
         let bookIndex = 0;
         let verseIndex = 0;
 
@@ -262,7 +262,7 @@ class BookSelector extends React.Component<IProps, IState> {
         this.props.onChange(this.state.books[bookIndex], chapterId, this.state.verses[verseIndex]);
     }
 
-    protected previous() {
+    protected previous(): void {
         if (!this.props.showNavButtons) {
             return;
         }

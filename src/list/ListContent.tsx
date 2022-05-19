@@ -44,7 +44,7 @@ class ListContent extends React.Component<IProps, IState> {
     protected translationService: TranslationService;
     protected bookService: BookService;
 
-    constructor(props: any) {
+    constructor(props: IProps) {
         super(props);
 
         this.listService = new ListService();
@@ -121,7 +121,7 @@ class ListContent extends React.Component<IProps, IState> {
         };
     }
 
-    protected clearDialogs() {
+    protected clearDialogs(): void {
         this.setState({
             addError: {
                 hasError: false,
@@ -138,7 +138,7 @@ class ListContent extends React.Component<IProps, IState> {
         });
     }
 
-    protected onWindowKeyDown(event: KeyboardEvent) {
+    protected onWindowKeyDown(event: KeyboardEvent): void {
         switch (event.key) {
             case 'Escape':
                 this.clearDialogs();
@@ -146,7 +146,7 @@ class ListContent extends React.Component<IProps, IState> {
         }
     }
 
-    protected onAddClick(event: React.MouseEvent) {
+    protected onAddClick(event: React.MouseEvent): void {
         event.preventDefault();
 
         if (!this.state.allowAdd || this.state.isLoading || this.state.isLoadingList) {
@@ -158,7 +158,7 @@ class ListContent extends React.Component<IProps, IState> {
         });
     }
 
-    protected onDeleteClick(event: React.MouseEvent, listVerse: IListVerse) {
+    protected onDeleteClick(event: React.MouseEvent, listVerse: IListVerse): void {
         event.preventDefault();
 
         this.setState({
@@ -167,7 +167,7 @@ class ListContent extends React.Component<IProps, IState> {
         });
     }
 
-    protected remove(listVerse: IListVerse) {
+    protected remove(listVerse: IListVerse): void {
         this.listService
             .removeVerse(this.props.match.params.listId, listVerse.text.id, listVerse.translation)
             .then(() => {
@@ -181,7 +181,7 @@ class ListContent extends React.Component<IProps, IState> {
             });
     }
 
-    protected load() {
+    protected load(): void {
         this.setState({
             isLoadingList: true,
         });
@@ -210,7 +210,7 @@ class ListContent extends React.Component<IProps, IState> {
             });
     }
 
-    protected addVerse() {
+    protected addVerse(): void {
         if (!this.state.verseToAdd.id) {
             return;
         }
@@ -247,7 +247,7 @@ class ListContent extends React.Component<IProps, IState> {
             });
     }
 
-    protected handleError(error: AxiosError) {
+    protected handleError(error: AxiosError): void {
         if (error.response?.status === 401) {
             this.props.history.push('/user/login');
 
@@ -255,23 +255,23 @@ class ListContent extends React.Component<IProps, IState> {
         }
     }
 
-    public componentDidMount() {
+    public componentDidMount(): void {
         this.load();
 
         window.addEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
     }
 
-    public componentWillUnmount() {
+    public componentWillUnmount(): void {
         window.removeEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
     }
 
-    protected onChangeTranslation(translation: ITranslation) {
+    protected onChangeTranslation(translation: ITranslation): void {
         this.setState({
             selectedTranslation: translation,
         });
     }
 
-    protected onChangeBook(book: IBook, chapterId: number, verse: IVerse) {
+    protected onChangeBook(book: IBook, chapterId: number, verse: IVerse): void {
         this.setState({
             verseToAdd: verse,
         });

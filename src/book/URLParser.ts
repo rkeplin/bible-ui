@@ -55,27 +55,27 @@ class URLParser {
         }
     }
 
-    public isSearchURL() {
+    public isSearchURL(): boolean {
         return this.searchUrl;
     }
 
-    public isBookURL() {
+    public isBookURL(): boolean {
         return this.bookUrl;
     }
 
-    public getTranslation() {
+    public getTranslation(): string {
         return this.translation.toUpperCase();
     }
 
-    public getBookId() {
+    public getBookId(): number {
         return this.bookId;
     }
 
-    public getChapterId() {
+    public getChapterId(): number {
         return this.chapterId;
     }
 
-    public getVerseId() {
+    public getVerseId(): number {
         return this.verseId;
     }
 }

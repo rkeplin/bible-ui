@@ -17,6 +17,7 @@ import ListContent from './list/ListContent';
 import UserService from './user/UserService';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEdit, faList, faMinusCircle } from '@fortawesome/free-solid-svg-icons';
+import { History, UnregisterCallback } from 'history';
 
 library.add(faEdit, faList, faMinusCircle);
 
@@ -39,9 +40,9 @@ interface IState {
 }
 
 class App extends React.Component<RouteComponentProps, IState> {
-    protected history: any;
+    protected history: History;
 
-    protected unlisten: any;
+    protected unlisten: UnregisterCallback;
 
     protected bookService: BookService;
 
@@ -55,6 +56,7 @@ class App extends React.Component<RouteComponentProps, IState> {
         this.bookService = new BookService();
         this.translationService = new TranslationService();
         this.userService = new UserService();
+        this.unlisten = () => void 0;
 
         this.history = this.props.history;
 
@@ -362,9 +364,7 @@ class App extends React.Component<RouteComponentProps, IState> {
                             selectedVerse={1}
                             showVerses={false}
                             showNavButtons={true}
-                            onChange={(book: IBook, chapterId: number, verse: IVerse) =>
-                                this.onChangeBook(book, chapterId, 0)
-                            }
+                            onChange={(book: IBook, chapterId: number) => this.onChangeBook(book, chapterId, 0)}
                         />
                     </div>
                 </div>

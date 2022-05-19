@@ -36,7 +36,7 @@ class TextDisplay extends React.Component<IProps, IState> {
         };
     }
 
-    protected load() {
+    protected load(): void {
         const service = new BookService();
 
         service.getText(this.props.bookId, this.props.chapterId, this.props.translation.abbreviation).then(
@@ -72,7 +72,7 @@ class TextDisplay extends React.Component<IProps, IState> {
         );
     }
 
-    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any) {
+    public componentDidUpdate(prevProps: Readonly<IProps>): void {
         let update = false;
 
         if (prevProps.verseId !== this.props.verseId) {
@@ -96,11 +96,11 @@ class TextDisplay extends React.Component<IProps, IState> {
         }
     }
 
-    public componentDidMount() {
+    public componentDidMount(): void {
         this.load();
     }
 
-    protected onDisplayCrossRefs(verse: IVerse, side: string) {
+    protected onDisplayCrossRefs(verse: IVerse, side: string): void {
         this.setState({
             displayCrossRefs: true,
             crossRefSide: side,
@@ -108,7 +108,7 @@ class TextDisplay extends React.Component<IProps, IState> {
         });
     }
 
-    protected toggleCrossRefModal(open: boolean) {
+    protected toggleCrossRefModal(open: boolean): void {
         this.setState({
             displayCrossRefs: open,
         });

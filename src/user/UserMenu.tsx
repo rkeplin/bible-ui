@@ -5,12 +5,12 @@ interface IProps extends RouteComponentProps {
     loggedIn: boolean;
 }
 
-class UserMenu extends React.Component<IProps, any> {
+class UserMenu extends React.Component<IProps, never> {
     constructor(props: IProps) {
         super(props);
     }
 
-    private onLoginClick(event: React.MouseEvent) {
+    private onLoginClick(event: React.MouseEvent): void {
         event.preventDefault();
 
         this.props.history.push('/user/login');

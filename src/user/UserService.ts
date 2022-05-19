@@ -31,7 +31,7 @@ class UserService extends HttpService {
             });
     }
 
-    public async register(email: string, password: string, passwordConf: string): Promise<any> {
+    public async register(email: string, password: string, passwordConf: string): Promise<AxiosResponse> {
         return this.httpClient
             .post(
                 'register',
@@ -65,7 +65,7 @@ class UserService extends HttpService {
             });
     }
 
-    public async logout(): Promise<any> {
+    public async logout(): Promise<AxiosResponse> {
         return this.httpClient
             .get('authenticate/logout', { withCredentials: true })
             .then((response: AxiosResponse) => {

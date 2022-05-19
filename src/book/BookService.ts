@@ -71,7 +71,7 @@ class BookService extends HttpService {
                     '?translation=' +
                     translationAbbr.toLowerCase(),
             )
-            .then((response: any) => {
+            .then((response: any): IVerse => {
                 const verse: IVerse = {
                     book: {
                         id: bookId,

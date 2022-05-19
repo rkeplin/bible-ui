@@ -18,7 +18,7 @@ class KeywordSearch extends React.Component<IProps, IState> {
         };
     }
 
-    protected search() {
+    protected search(): void {
         if (this.state.search.length < 1) {
             return;
         }
@@ -30,7 +30,7 @@ class KeywordSearch extends React.Component<IProps, IState> {
         this.props.onSearch(this.state.search);
     }
 
-    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any) {
+    public componentDidUpdate(prevProps: Readonly<IProps>): void {
         if (prevProps.search !== this.props.search) {
             this.setState({
                 search: this.props.search,
@@ -38,7 +38,7 @@ class KeywordSearch extends React.Component<IProps, IState> {
         }
     }
 
-    protected handleKeyPress(event: any /* React.KeyboardEvent<HTMLInputElement> */) {
+    protected handleKeyPress(event: any /* React.KeyboardEvent<HTMLInputElement> */): void {
         if (event.key.toUpperCase() !== 'ENTER') {
             return;
         }
@@ -50,7 +50,7 @@ class KeywordSearch extends React.Component<IProps, IState> {
         this.search();
     }
 
-    protected handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    protected handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
         this.setState({
             search: event.target.value,
         });

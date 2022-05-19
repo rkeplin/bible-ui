@@ -16,7 +16,7 @@ interface IState {
 class RegistrationForm extends React.Component<RouteComponentProps, IState> {
     protected service: UserService;
 
-    constructor(props: any) {
+    constructor(props: RouteComponentProps) {
         super(props);
 
         this.service = new UserService();
@@ -32,7 +32,7 @@ class RegistrationForm extends React.Component<RouteComponentProps, IState> {
         };
     }
 
-    protected onRegisterClick() {
+    protected onRegisterClick(): void {
         this.service
             .register(this.state.email, this.state.password, this.state.passwordConfirmation)
             .then((response) => {
@@ -55,7 +55,7 @@ class RegistrationForm extends React.Component<RouteComponentProps, IState> {
             });
     }
 
-    protected handleKeyPress(event: any /* React.KeyboardEvent<HTMLInputElement> */) {
+    protected handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>): void {
         if (event.key.toUpperCase() !== 'ENTER') {
             return;
         }
@@ -63,7 +63,7 @@ class RegistrationForm extends React.Component<RouteComponentProps, IState> {
         this.onRegisterClick();
     }
 
-    protected onCancelClick(event: React.MouseEvent) {
+    protected onCancelClick(event: React.MouseEvent): void {
         event.preventDefault();
 
         this.props.history.push('/user/login');

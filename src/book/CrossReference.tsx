@@ -23,7 +23,7 @@ interface IState {
 }
 
 class CrossReference extends React.Component<IProps, IState> {
-    constructor(props: any) {
+    constructor(props: IProps) {
         super(props);
 
         this.state = {
@@ -35,13 +35,13 @@ class CrossReference extends React.Component<IProps, IState> {
         };
     }
 
-    protected onClose(event: React.MouseEvent) {
+    protected onClose(event: React.MouseEvent): void {
         event.preventDefault();
 
         this.close();
     }
 
-    protected close() {
+    protected close(): void {
         this.setState({
             style: {
                 display: 'none',
@@ -51,7 +51,7 @@ class CrossReference extends React.Component<IProps, IState> {
         this.props.toggleModal(false);
     }
 
-    protected load() {
+    protected load(): void {
         this.setState({
             isLoading: true,
             relatedVerses: [],
@@ -85,7 +85,7 @@ class CrossReference extends React.Component<IProps, IState> {
         this.props.toggleModal(true);
     }
 
-    protected handleKeyDown(event: KeyboardEvent) {
+    protected handleKeyDown(event: KeyboardEvent): void {
         switch (event.key) {
             case 'Escape':
                 this.close();
@@ -93,15 +93,15 @@ class CrossReference extends React.Component<IProps, IState> {
         }
     }
 
-    public componentWillUnmount() {
+    public componentWillUnmount(): void {
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
     }
 
-    public componentDidMount() {
+    public componentDidMount(): void {
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
     }
 
-    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<any>, snapshot?: any) {
+    public componentDidUpdate(prevProps: Readonly<IProps>): void {
         if (!this.props.open) {
             return;
         }

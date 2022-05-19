@@ -34,7 +34,7 @@ class LoginForm extends React.Component<IProps, IState> {
         };
     }
 
-    private onLoginClick() {
+    private onLoginClick(): void {
         this.setState({
             isLoading: true,
         });
@@ -62,7 +62,7 @@ class LoginForm extends React.Component<IProps, IState> {
             });
     }
 
-    protected handleKeyPress(event: any /* React.KeyboardEvent<HTMLInputElement> */) {
+    protected handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>): void {
         if (event.key.toUpperCase() !== 'ENTER') {
             return;
         }
@@ -70,7 +70,7 @@ class LoginForm extends React.Component<IProps, IState> {
         this.onLoginClick();
     }
 
-    private onRegisterClick(event: React.MouseEvent) {
+    private onRegisterClick(event: React.MouseEvent): void {
         event.preventDefault();
 
         this.props.history.push('/user/register');

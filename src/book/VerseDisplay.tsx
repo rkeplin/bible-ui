@@ -6,7 +6,11 @@ interface IProps {
     verse: IVerse;
 }
 
-class VerseDisplay extends React.Component<IProps, any> {
+interface IState {
+    highlight: boolean;
+}
+
+class VerseDisplay extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
 
@@ -15,7 +19,7 @@ class VerseDisplay extends React.Component<IProps, any> {
         };
     }
 
-    protected onDisplayCrossRefs(event: React.MouseEvent) {
+    protected onDisplayCrossRefs(event: React.MouseEvent): void {
         event.preventDefault();
 
         this.props.onDisplayCrossRefs(this.props.verse);

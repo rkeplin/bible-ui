@@ -29,7 +29,7 @@ class SearchChart {
         this.chart?.update();
     }
 
-    protected getOptions() : ChartConfiguration {
+    protected getOptions(): ChartConfiguration {
         const labels: [] = [];
         const data: [] = [];
 

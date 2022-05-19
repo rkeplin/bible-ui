@@ -14,7 +14,7 @@ interface IState {
 }
 
 class TranslationSelector extends React.Component<IProps, IState> {
-    constructor(props: any) {
+    constructor(props: IProps) {
         super(props);
 
         this.state = {
@@ -24,7 +24,7 @@ class TranslationSelector extends React.Component<IProps, IState> {
         };
     }
 
-    public componentDidMount() {
+    public componentDidMount(): void {
         this.setState({
             isLoading: true,
         });

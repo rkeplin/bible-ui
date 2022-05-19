@@ -26,7 +26,7 @@ class SearchResults extends React.Component<IProps, IState> {
     protected limit: number;
     protected searchChart: any;
 
-    constructor(props: any) {
+    constructor(props: IProps) {
         super(props);
 
         this.state = {
@@ -44,7 +44,7 @@ class SearchResults extends React.Component<IProps, IState> {
         this.limit = 100;
     }
 
-    protected load() {
+    protected load(): void {
         this.props.changeTitle('Loading...', '');
 
         const service = new SearchService();
@@ -83,7 +83,7 @@ class SearchResults extends React.Component<IProps, IState> {
             });
     }
 
-    protected loadAggregate() {
+    protected loadAggregate(): void {
         const service = new SearchService();
 
         this.setState({
@@ -125,20 +125,20 @@ class SearchResults extends React.Component<IProps, IState> {
         this.load();
     }
 
-    public componentDidMount() {
+    public componentDidMount(): void {
         this.load();
         this.loadAggregate();
 
         this.searchChart = new SearchChart('graph');
     }
 
-    protected onVerseClick(e: React.MouseEvent, verse: IVerse) {
+    protected onVerseClick(e: React.MouseEvent, verse: IVerse): void {
         e.preventDefault();
 
         this.props.onChange(verse.book, verse.chapterId, verse.verseId);
     }
 
-    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any) {
+    public componentDidUpdate(prevProps: Readonly<IProps>): void {
         if (prevProps.search === this.props.search) {
             if (prevProps.translationAbbr === this.props.translationAbbr) {
                 return;

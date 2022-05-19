@@ -2,16 +2,16 @@ import React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import UserService from './UserService';
 
-class Logout extends React.Component<RouteComponentProps, any> {
+class Logout extends React.Component<RouteComponentProps, never> {
     protected service: UserService;
 
-    constructor(props: any) {
+    constructor(props: RouteComponentProps) {
         super(props);
 
         this.service = new UserService();
     }
 
-    public componentDidMount() {
+    public componentDidMount(): void {
         this.service.logout().then(() => {
             this.props.history.push('/user/login');
 

@@ -87,8 +87,8 @@ class SearchChart {
                                 return tooltipItem[0].label + ' - ' + testament;
                             },
                             label: (tooltipItem: any) => {
-                                if (tooltipItem?.yLabel) {
-                                    return tooltipItem.yLabel.toLocaleString() + ' Results';
+                                if (tooltipItem?.formattedValue) {
+                                    return tooltipItem.formattedValue.toLocaleString() + ' Results';
                                 }
 
                                 return '0 Results';

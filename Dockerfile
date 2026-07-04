@@ -3,9 +3,9 @@ FROM node:15.4.0-alpine3.10 AS build
 
 WORKDIR /app
 
-COPY package.json /app
+COPY package.json yarn.lock /app/
 
-RUN yarn install && yarn cache clean
+RUN yarn install --frozen-lockfile && yarn cache clean
 
 COPY . /app
 

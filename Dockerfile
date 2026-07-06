@@ -9,6 +9,12 @@ RUN yarn install --frozen-lockfile && yarn cache clean
 
 COPY . /app
 
+ARG REACT_APP_API_URL
+ARG REACT_APP_USER_API_URL
+
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+ENV REACT_APP_USER_API_URL=$REACT_APP_USER_API_URL
+
 RUN yarn run build
 
 # Serve it

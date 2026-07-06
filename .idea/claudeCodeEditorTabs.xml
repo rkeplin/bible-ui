@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ClaudeCodeEditorTabs">
+    <option name="activeSessionId" value="0792253d-a11f-494f-9820-658682534d45" />
+    <option name="openSessionIds">
+      <list>
+        <option value="0792253d-a11f-494f-9820-658682534d45" />
+      </list>
+    </option>
+    <option name="sessionPaths">
+      <map>
+        <entry key="0792253d-a11f-494f-9820-658682534d45" value="/sessions/f477fdd3-ef78-4221-b369-502692150aaf" />
+      </map>
+    </option>
+    <option name="sessionTitles">
+      <map>
+        <entry key="0792253d-a11f-494f-9820-658682534d45" value="when i do docker-composer up, and then go to local" />
+      </map>
+    </option>
+  </component>
+</project>

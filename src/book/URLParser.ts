@@ -1,7 +1,7 @@
 class URLParser {
-    private static BOOK_PAGE_REGEX = /\/book\/([a-z]{3,5})\/([\d]{1,3})\/([\d]{1,3})/;
+    private static BOOK_PAGE_REGEX = /\/book\/([a-z0-9]{3,10})\/([\d]{1,3})\/([\d]{1,3})/;
 
-    private static SEARCH_PAGE_REGEX = /\/search\/([a-z]{3,5})/;
+    private static SEARCH_PAGE_REGEX = /\/search\/([a-z0-9]{3,10})/;
 
     protected url: string;
 

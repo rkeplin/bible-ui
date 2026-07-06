@@ -30,11 +30,11 @@ class SearchChart {
     }
 
     protected getOptions(): ChartConfiguration {
-        const labels: [] = [];
-        const data: [] = [];
+        const labels: string[] = [];
+        const data: number[] = [];
 
-        const backgroundColors = [];
-        const borderColors = [];
+        const backgroundColors: string[] = [];
+        const borderColors: string[] = [];
 
         // Old testament colors
         let bg = 'rgba(81, 81, 81, 0.2)';
@@ -77,16 +77,16 @@ class SearchChart {
                         padding: 15,
                         backgroundColor: 'rgba(108, 117, 125, 1)',
                         callbacks: {
-                            title: (tooltipItem: any) => {
-                                let testament = 'Old Testament';
+                            title: (tooltipItems) => {
+                                const item = tooltipItems[0];
+                                const testament =
+                                    item?.dataIndex !== undefined && item.dataIndex < 39
+                                        ? 'Old Testament'
+                                        : 'New Testament';
 
-                                if (tooltipItem[0]?.index) {
-                                    testament = tooltipItem[0].index < 39 ? 'Old Testament' : 'New Testament';
-                                }
-
-                                return tooltipItem[0].label + ' - ' + testament;
+                                return (item?.label ?? '') + ' - ' + testament;
                             },
-                            label: (tooltipItem: any) => {
+                            label: (tooltipItem) => {
                                 if (tooltipItem?.formattedValue) {
                                     return tooltipItem.formattedValue.toLocaleString() + ' Results';
                                 }

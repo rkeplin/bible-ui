@@ -1,5 +1,5 @@
 import React from 'react';
-import { RouteComponentProps, withRouter, match } from 'react-router-dom';
+import { withRouter, RouteComponentProps } from '../withRouter';
 import ListService, { IList, IListVerse } from './ListService';
 import { AxiosError } from 'axios';
 import TranslationSelector from '../book/TranslationSelector';
@@ -8,6 +8,11 @@ import BookSelector from '../book/BookSelector';
 import BookService, { IBook, ITranslation, IVerse } from '../book/BookService';
 import FormError, { IFormError } from '../core/FormError';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+interface IErrorData {
+    description?: string;
+    errors?: string[];
+}
 
 interface IState {
     isLoadingList: boolean;
@@ -27,29 +32,19 @@ interface IState {
     deleteError: IFormError;
 }
 
-interface IParams {
-    listId: string;
-}
-
-interface IMatch extends match<any> {
-    params: IParams;
-}
-
-interface IProps extends RouteComponentProps {
-    match: IMatch;
-}
-
-class ListContent extends React.Component<IProps, IState> {
+class ListContent extends React.Component<RouteComponentProps, IState> {
     protected listService: ListService;
     protected translationService: TranslationService;
     protected bookService: BookService;
+    protected onWindowKeyDownBound: (event: KeyboardEvent) => void;
 
-    constructor(props: IProps) {
+    constructor(props: RouteComponentProps) {
         super(props);
 
         this.listService = new ListService();
         this.bookService = new BookService();
         this.translationService = new TranslationService();
+        this.onWindowKeyDownBound = (e) => this.onWindowKeyDown(e);
 
         this.state = {
             isLoadingList: true,
@@ -104,6 +99,10 @@ class ListContent extends React.Component<IProps, IState> {
                 errors: [],
             },
         };
+    }
+
+    protected get listId(): string {
+        return this.props.match.params.listId ?? '';
     }
 
     protected initVerse(): IVerse {
@@ -169,7 +168,7 @@ class ListContent extends React.Component<IProps, IState> {
 
     protected remove(listVerse: IListVerse): void {
         this.listService
-            .removeVerse(this.props.match.params.listId, listVerse.text.id, listVerse.translation)
+            .removeVerse(this.listId, listVerse.text.id, listVerse.translation)
             .then(() => {
                 this.setState({
                     displayDeleteDialog: false,
@@ -187,7 +186,7 @@ class ListContent extends React.Component<IProps, IState> {
         });
 
         this.listService
-            .getOne(this.props.match.params.listId)
+            .getOne(this.listId)
             .then((list: IList) => {
                 this.setState({
                     list: list,
@@ -198,7 +197,7 @@ class ListContent extends React.Component<IProps, IState> {
             });
 
         this.listService
-            .getVerses(this.props.match.params.listId)
+            .getVerses(this.listId)
             .then((verseList) => {
                 this.setState({
                     isLoadingList: false,
@@ -220,28 +219,22 @@ class ListContent extends React.Component<IProps, IState> {
         }
 
         this.listService
-            .addVerse(
-                this.props.match.params.listId,
-                this.state.verseToAdd.id,
-                this.state.selectedTranslation.abbreviation,
-            )
-            .then((verse) => {
+            .addVerse(this.listId, this.state.verseToAdd.id, this.state.selectedTranslation.abbreviation)
+            .then(() => {
                 this.setState({
                     displayAddDialog: false,
                     verseToAdd: this.initVerse(),
                 });
             })
             .then(() => this.load())
-            .catch((error: AxiosError) => {
+            .catch((error: AxiosError<IErrorData>) => {
                 this.handleError(error);
 
                 this.setState({
                     addError: {
                         hasError: true,
-                        errorDescription: error.response?.data?.description
-                            ? error.response?.data?.description
-                            : 'Error',
-                        errors: error.response?.data?.errors ? error.response?.data?.errors : [],
+                        errorDescription: error.response?.data?.description ?? 'Error',
+                        errors: error.response?.data?.errors ?? [],
                     },
                 });
             });
@@ -258,11 +251,11 @@ class ListContent extends React.Component<IProps, IState> {
     public componentDidMount(): void {
         this.load();
 
-        window.addEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
+        window.addEventListener('keydown', this.onWindowKeyDownBound, false);
     }
 
     public componentWillUnmount(): void {
-        window.removeEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
+        window.removeEventListener('keydown', this.onWindowKeyDownBound, false);
     }
 
     protected onChangeTranslation(translation: ITranslation): void {
@@ -271,7 +264,7 @@ class ListContent extends React.Component<IProps, IState> {
         });
     }
 
-    protected onChangeBook(book: IBook, chapterId: number, verse: IVerse): void {
+    protected onChangeBook(_book: IBook, _chapterId: number, verse: IVerse): void {
         this.setState({
             verseToAdd: verse,
         });

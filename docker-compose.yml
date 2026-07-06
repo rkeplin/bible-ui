@@ -3,15 +3,16 @@ services:
   bible-ui:
     build:
       context: .
-      args:
-        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost/go-api}
-        - REACT_APP_USER_API_URL=${REACT_APP_USER_API_URL:-http://localhost/php-api/v1}
+      dockerfile: Dockerfile.dev
     stdin_open: true
     ports:
-      - 80:80
+      - 80:5173
     volumes:
       - .:/app
       - /app/node_modules
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-/go-api}
+      - VITE_USER_API_URL=${VITE_USER_API_URL:-/php-api/v1}
     depends_on:
       - go-api
       - php-api
@@ -87,7 +88,7 @@ services:
       - net1
 
   mongo:
-    image: mongo:4.2.2-bionic
+    image: mongo:4.4
     restart: always
     environment:
       - MONGO_INITDB_DATABASE=${MONGO_DB:-app}
@@ -99,7 +100,7 @@ services:
       - net1
 
   redis:
-    image: redis:5.0.7
+    image: redis:7.4-alpine
     restart: always
     networks:
       - net1

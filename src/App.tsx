@@ -4,7 +4,7 @@ import BookSelector from './book/BookSelector';
 import KeywordSearch from './book/KeywordSearch';
 import UserMenu from './user/UserMenu';
 import TextDisplay from './book/TextDisplay';
-import { Switch, Route, Redirect, withRouter, RouteComponentProps } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import URLParser from './book/URLParser';
 import BookService, { IBook, ITranslation, IVerse } from './book/BookService';
 import TranslationService from './book/TranslationService';
@@ -17,7 +17,7 @@ import ListContent from './list/ListContent';
 import UserService from './user/UserService';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEdit, faList, faMinusCircle } from '@fortawesome/free-solid-svg-icons';
-import { History, UnregisterCallback } from 'history';
+import { withRouter, RouteComponentProps } from './withRouter';
 
 library.add(faEdit, faList, faMinusCircle);
 
@@ -40,10 +40,6 @@ interface IState {
 }
 
 class App extends React.Component<RouteComponentProps, IState> {
-    protected history: History;
-
-    protected unlisten: UnregisterCallback;
-
     protected bookService: BookService;
 
     protected translationService: TranslationService;
@@ -56,9 +52,6 @@ class App extends React.Component<RouteComponentProps, IState> {
         this.bookService = new BookService();
         this.translationService = new TranslationService();
         this.userService = new UserService();
-        this.unlisten = () => void 0;
-
-        this.history = this.props.history;
 
         const parser = new URLParser(this.props.location.pathname, this.props.location.search);
 
@@ -135,7 +128,6 @@ class App extends React.Component<RouteComponentProps, IState> {
         }
 
         if (pathname.startsWith('/book')) {
-            // Skip if we aren't on the book page and the nav is closed
             const parser = new URLParser(pathname, search);
 
             let book: IBook;
@@ -195,13 +187,13 @@ class App extends React.Component<RouteComponentProps, IState> {
         const parser = new URLParser(this.props.location.pathname, this.props.location.search);
 
         if (parser.isSearchURL()) {
-            this.history.push('/search/' + translation.abbreviation.toLowerCase() + this.props.location.search);
+            this.props.history.push('/search/' + translation.abbreviation.toLowerCase() + this.props.location.search);
 
             return;
         }
 
         if (parser.isBookURL()) {
-            this.history.push(
+            this.props.history.push(
                 '/book/' +
                     translation.abbreviation.toLowerCase() +
                     '/' +
@@ -223,10 +215,6 @@ class App extends React.Component<RouteComponentProps, IState> {
     public componentDidMount() {
         this.init(this.props.location.pathname, this.props.location.search);
 
-        this.unlisten = this.props.history.listen((location) => {
-            this.init(location.pathname, location.search);
-        });
-
         this.userService
             .me()
             .then(() => {
@@ -237,8 +225,13 @@ class App extends React.Component<RouteComponentProps, IState> {
             });
     }
 
-    public componentWillUnmount() {
-        this.unlisten();
+    public componentDidUpdate(prevProps: Readonly<RouteComponentProps>): void {
+        if (
+            prevProps.location.pathname !== this.props.location.pathname ||
+            prevProps.location.search !== this.props.location.search
+        ) {
+            this.init(this.props.location.pathname, this.props.location.search);
+        }
     }
 
     protected onChangeBook(book: IBook, chapterId: number, verseId: number) {
@@ -251,7 +244,7 @@ class App extends React.Component<RouteComponentProps, IState> {
         window.scrollTo(0, 0);
 
         if (verseId != 0) {
-            this.history.push(
+            this.props.history.push(
                 '/book/' +
                     this.state.translation.abbreviation.toLowerCase() +
                     '/' +
@@ -265,7 +258,7 @@ class App extends React.Component<RouteComponentProps, IState> {
             return;
         }
 
-        this.history.push(
+        this.props.history.push(
             '/book/' + this.state.translation.abbreviation.toLowerCase() + '/' + book.id + '/' + chapterId,
         );
     }
@@ -273,7 +266,7 @@ class App extends React.Component<RouteComponentProps, IState> {
     protected onSearch(search: string) {
         window.scrollTo(0, 0);
 
-        this.history.push('/search/' + this.state.translation.abbreviation.toLowerCase() + '?query=' + search);
+        this.props.history.push('/search/' + this.state.translation.abbreviation.toLowerCase() + '?query=' + search);
     }
 
     protected onChangeTitle(title: string, subTitle: string) {
@@ -370,52 +363,49 @@ class App extends React.Component<RouteComponentProps, IState> {
                 </div>
                 <div id="main" className={`pl-5 pr-5 ${this.state.isNavOpen ? 'nav-open' : ''}`}>
                     <div id="content">
-                        <Switch>
-                            <Route path="/book/:translation/:bookId/:chapterId">
-                                <TextDisplay
-                                    translation={this.state.translation}
-                                    bookId={this.state.book.id}
-                                    chapterId={this.state.chapterId}
-                                    verseId={this.state.verseId}
-                                    toggleCrossRefModal={(selectedVerse: IVerse | undefined, open: boolean) =>
-                                        this.toggleCrossRefModal(selectedVerse, open)
-                                    }
-                                />
-                            </Route>
+                        <Routes>
+                            <Route
+                                path="/book/:translation/:bookId/:chapterId"
+                                element={
+                                    <TextDisplay
+                                        translation={this.state.translation}
+                                        bookId={this.state.book.id}
+                                        chapterId={this.state.chapterId}
+                                        verseId={this.state.verseId}
+                                        toggleCrossRefModal={(selectedVerse: IVerse | undefined, open: boolean) =>
+                                            this.toggleCrossRefModal(selectedVerse, open)
+                                        }
+                                    />
+                                }
+                            />
 
-                            <Route path="/search/:translation">
-                                <SearchResults
-                                    changeTitle={(title, subTitle) => this.onChangeTitle(title, subTitle)}
-                                    isLoading={this.state.search.isLoading}
-                                    search={this.state.search.search}
-                                    translationAbbr={this.state.translation.abbreviation}
-                                    onChange={(book: IBook, chapterId: number, verseId: number) =>
-                                        this.onChangeBook(book, chapterId, verseId)
-                                    }
-                                />
-                            </Route>
+                            <Route
+                                path="/search/:translation"
+                                element={
+                                    <SearchResults
+                                        changeTitle={(title, subTitle) => this.onChangeTitle(title, subTitle)}
+                                        isLoading={this.state.search.isLoading}
+                                        search={this.state.search.search}
+                                        translationAbbr={this.state.translation.abbreviation}
+                                        onChange={(book: IBook, chapterId: number, verseId: number) =>
+                                            this.onChangeBook(book, chapterId, verseId)
+                                        }
+                                    />
+                                }
+                            />
 
-                            <Route path="/user/login">
-                                <LoginForm onLogin={() => this.onLogin()} />
-                            </Route>
+                            <Route path="/user/login" element={<LoginForm onLogin={() => this.onLogin()} />} />
 
-                            <Route path="/user/logout">
-                                <Logout />
-                            </Route>
+                            <Route path="/user/logout" element={<Logout />} />
 
-                            <Route path="/user/register">
-                                <RegistrationForm />
-                            </Route>
+                            <Route path="/user/register" element={<RegistrationForm />} />
 
-                            <Route path="/list/:listId/verses">
-                                <ListContent />
-                            </Route>
+                            <Route path="/list/:listId/verses" element={<ListContent />} />
 
-                            <Route path="/list">
-                                <ManageLists />
-                            </Route>
-                            <Redirect to="/book/kjv/1/1"></Redirect>
-                        </Switch>
+                            <Route path="/list" element={<ManageLists />} />
+
+                            <Route path="*" element={<Navigate to="/book/kjv/1/1" replace />} />
+                        </Routes>
                     </div>
                 </div>
             </div>

@@ -26,8 +26,12 @@ interface IProps {
 }
 
 class BookSelector extends React.Component<IProps, IState> {
+    protected handleKeyDownBound: (event: KeyboardEvent) => void;
+
     constructor(props: IProps) {
         super(props);
+
+        this.handleKeyDownBound = (e) => this.handleKeyDown(e);
 
         this.state = {
             selectedBook: this.props.selectedBook,
@@ -45,8 +49,6 @@ class BookSelector extends React.Component<IProps, IState> {
     }
 
     protected handleKeyDown(event: KeyboardEvent): void {
-        // TODO: Only do this when the user is on the book page
-
         if (this.state.isLoadingBooks || this.state.isLoadingChapters || this.state.isLoadingVerses) {
             return;
         }
@@ -74,11 +76,11 @@ class BookSelector extends React.Component<IProps, IState> {
     }
 
     public componentWillUnmount(): void {
-        document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+        document.removeEventListener('keydown', this.handleKeyDownBound);
     }
 
     public componentDidMount(): void {
-        document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+        document.addEventListener('keydown', this.handleKeyDownBound);
 
         this.setState({
             disablePrevBtn: this.disablePrev(this.props.selectedChapter),
@@ -291,29 +293,21 @@ class BookSelector extends React.Component<IProps, IState> {
     }
 
     public render(): JSX.Element {
-        const oldTestBooks = this.state.books.map((book: IBook) => {
-            if (book.testament !== 'OT') {
-                return;
-            }
-
-            return (
+        const oldTestBooks = this.state.books
+            .filter((book: IBook) => book.testament === 'OT')
+            .map((book: IBook) => (
                 <option key={book.id} value={book.id}>
                     {book.name}
                 </option>
-            );
-        });
+            ));
 
-        const newTestBooks = this.state.books.map((book: IBook) => {
-            if (book.testament !== 'NT') {
-                return;
-            }
-
-            return (
+        const newTestBooks = this.state.books
+            .filter((book: IBook) => book.testament === 'NT')
+            .map((book: IBook) => (
                 <option key={book.id} value={book.id}>
                     {book.name}
                 </option>
-            );
-        });
+            ));
 
         const chapters = this.state.chapters.map((chapter: IChapter) => (
             <option key={chapter.id} value={chapter.id}>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { withRouter, RouteComponentProps } from '../withRouter';
 import UserService from './UserService';
 
 class Logout extends React.Component<RouteComponentProps, never> {

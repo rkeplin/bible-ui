@@ -1,7 +1,12 @@
 import React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { withRouter, RouteComponentProps } from '../withRouter';
 import { AxiosError } from 'axios';
 import UserService from './UserService';
+
+interface IErrorData {
+    description?: string;
+    errors?: string[];
+}
 
 interface IState {
     isLoading: boolean;
@@ -40,11 +45,11 @@ class RegistrationForm extends React.Component<RouteComponentProps, IState> {
 
                 return response;
             })
-            .catch((error: AxiosError) => {
+            .catch((error: AxiosError<IErrorData>) => {
                 this.setState({
                     hasError: true,
-                    errorDescription: error.response?.data?.description ? error.response?.data?.description : 'Error',
-                    errors: error.response?.data?.errors ? error.response?.data?.errors : [],
+                    errorDescription: error.response?.data?.description ?? 'Error',
+                    errors: error.response?.data?.errors ?? [],
                     isLoading: false,
                 });
 
@@ -55,7 +60,7 @@ class RegistrationForm extends React.Component<RouteComponentProps, IState> {
             });
     }
 
-    protected handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>): void {
+    protected handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>): void {
         if (event.key.toUpperCase() !== 'ENTER') {
             return;
         }
@@ -130,8 +135,8 @@ class RegistrationForm extends React.Component<RouteComponentProps, IState> {
                                         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                                             this.setState({ passwordConfirmation: event.target.value })
                                         }
-                                        onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) =>
-                                            this.handleKeyPress(event)
+                                        onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>
+                                            this.handleKeyDown(event)
                                         }
                                         placeholder="Enter password confirmation..."
                                     />

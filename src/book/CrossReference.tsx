@@ -23,8 +23,12 @@ interface IState {
 }
 
 class CrossReference extends React.Component<IProps, IState> {
+    protected handleKeyDownBound: (event: KeyboardEvent) => void;
+
     constructor(props: IProps) {
         super(props);
+
+        this.handleKeyDownBound = (e) => this.handleKeyDown(e);
 
         this.state = {
             isLoading: true,
@@ -94,11 +98,11 @@ class CrossReference extends React.Component<IProps, IState> {
     }
 
     public componentWillUnmount(): void {
-        document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+        document.removeEventListener('keydown', this.handleKeyDownBound);
     }
 
     public componentDidMount(): void {
-        document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+        document.addEventListener('keydown', this.handleKeyDownBound);
     }
 
     public componentDidUpdate(prevProps: Readonly<IProps>): void {

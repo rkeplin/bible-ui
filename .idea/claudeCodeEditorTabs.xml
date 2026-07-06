@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ClaudeCodeEditorTabs">
-    <option name="activeSessionId" value="0792253d-a11f-494f-9820-658682534d45" />
+    <option name="activeSessionId" value="fa220721-2f43-4b85-966e-5bbca4fe22bb" />
     <option name="openSessionIds">
       <list>
-        <option value="0792253d-a11f-494f-9820-658682534d45" />
+        <option value="fa220721-2f43-4b85-966e-5bbca4fe22bb" />
       </list>
     </option>
     <option name="sessionPaths">
       <map>
-        <entry key="0792253d-a11f-494f-9820-658682534d45" value="/sessions/f477fdd3-ef78-4221-b369-502692150aaf" />
+        <entry key="a93916ad-b0e9-4dc7-b579-1c8860dd6775" value="/sessions/new" />
+        <entry key="fa220721-2f43-4b85-966e-5bbca4fe22bb" value="/sessions/e7af7aca-4719-41ab-a719-edcbbf004707" />
       </map>
     </option>
     <option name="sessionTitles">
       <map>
-        <entry key="0792253d-a11f-494f-9820-658682534d45" value="when i do docker-composer up, and then go to local" />
+        <entry key="a93916ad-b0e9-4dc7-b579-1c8860dd6775" value="Claude Code" />
+        <entry key="fa220721-2f43-4b85-966e-5bbca4fe22bb" value="it has been a while since i made updates to this p" />
       </map>
     </option>
   </component>

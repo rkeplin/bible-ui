@@ -1,11 +1,16 @@
 import React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { withRouter, RouteComponentProps } from '../withRouter';
 import UserService, { IUser } from '../user/UserService';
 import ListService, { IList } from './ListService';
 import FormError, { IFormError } from '../core/FormError';
 import { AxiosError } from 'axios';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+interface IErrorData {
+    description?: string;
+    errors?: string[];
+}
 
 interface IState {
     isLoading: boolean;
@@ -23,12 +28,14 @@ interface IState {
 class ManageLists extends React.Component<RouteComponentProps, IState> {
     protected userService: UserService;
     protected listService: ListService;
+    protected onWindowKeyDownBound: (event: KeyboardEvent) => void;
 
-    constructor(props: any) {
+    constructor(props: RouteComponentProps) {
         super(props);
 
         this.userService = new UserService();
         this.listService = new ListService();
+        this.onWindowKeyDownBound = (e) => this.onWindowKeyDown(e);
 
         this.state = {
             isLoading: true,
@@ -68,7 +75,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
         }
     }
 
-    protected handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>, callback: () => void) {
+    protected handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>, callback: () => void) {
         switch (event.key) {
             case 'Enter':
                 callback();
@@ -116,7 +123,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
     public componentDidMount() {
         this.userService
             .me()
-            .then((user: IUser) => {
+            .then((_user: IUser) => {
                 this.load();
             })
             .catch(() => {
@@ -125,11 +132,11 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                 window.scrollTo(0, 0);
             });
 
-        window.addEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
+        window.addEventListener('keydown', this.onWindowKeyDownBound, false);
     }
 
     public componentWillUnmount() {
-        window.removeEventListener('keydown', (event: KeyboardEvent) => this.onWindowKeyDown(event), false);
+        window.removeEventListener('keydown', this.onWindowKeyDownBound, false);
     }
 
     protected onAddListClick(event: React.MouseEvent) {
@@ -169,14 +176,12 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                 this.load();
                 this.clearDialogs();
             })
-            .catch((error: AxiosError) => {
+            .catch((error: AxiosError<IErrorData>) => {
                 this.setState({
                     addError: {
                         hasError: true,
-                        errorDescription: error.response?.data?.description
-                            ? error.response?.data?.description
-                            : 'Error',
-                        errors: error.response?.data?.errors ? error.response?.data?.errors : [],
+                        errorDescription: error.response?.data?.description ?? 'Error',
+                        errors: error.response?.data?.errors ?? [],
                     },
                 });
             })
@@ -198,14 +203,12 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                 this.load();
                 this.clearDialogs();
             })
-            .catch((error: AxiosError) => {
+            .catch((error: AxiosError<IErrorData>) => {
                 this.setState({
                     addError: {
                         hasError: true,
-                        errorDescription: error.response?.data?.description
-                            ? error.response?.data?.description
-                            : 'Error',
-                        errors: error.response?.data?.errors ? error.response?.data?.errors : [],
+                        errorDescription: error.response?.data?.description ?? 'Error',
+                        errors: error.response?.data?.errors ?? [],
                     },
                 });
             })
@@ -227,14 +230,12 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                 this.load();
                 this.clearDialogs();
             })
-            .catch((error: AxiosError) => {
+            .catch((error: AxiosError<IErrorData>) => {
                 this.setState({
                     addError: {
                         hasError: true,
-                        errorDescription: error.response?.data?.description
-                            ? error.response?.data?.description
-                            : 'Error',
-                        errors: error.response?.data?.errors ? error.response?.data?.errors : [],
+                        errorDescription: error.response?.data?.description ?? 'Error',
+                        errors: error.response?.data?.errors ?? [],
                     },
                 });
             })
@@ -353,8 +354,8 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                                         }
                                         type="text"
                                         placeholder="Enter list name..."
-                                        onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) =>
-                                            this.handleKeyPress(event, () => this.create(this.state.list))
+                                        onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>
+                                            this.handleKeyDown(event, () => this.create(this.state.list))
                                         }
                                     />
                                 </div>
@@ -401,8 +402,8 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
                                         }
                                         type="text"
                                         placeholder="Enter list name..."
-                                        onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) =>
-                                            this.handleKeyPress(event, () => this.update(this.state.list))
+                                        onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>
+                                            this.handleKeyDown(event, () => this.update(this.state.list))
                                         }
                                     />
                                 </div>

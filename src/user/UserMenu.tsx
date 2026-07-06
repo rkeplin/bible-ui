@@ -1,5 +1,6 @@
 import React from 'react';
-import { RouteComponentProps, withRouter, Link } from 'react-router-dom';
+import { withRouter, RouteComponentProps } from '../withRouter';
+import { Link } from 'react-router-dom';
 
 interface IProps extends RouteComponentProps {
     loggedIn: boolean;

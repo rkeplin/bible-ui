@@ -1,33 +1,39 @@
-.PHONY: dev
+NS ?= bible
+
+.PHONY: dev down logs build pretty push
+
 dev:
-	@echo "🤓 Spinning Up Dev Version"
 	docker-compose up
 
-.PHONY: pretty
+down:
+	docker-compose down --remove-orphans
+
+logs:
+	docker-compose logs -f
+
+build:
+	docker-compose build
+
 pretty:
 	yarn eslint ./src --ext .ts,.tsx --fix
 
-.PHONY: down
-down:
-	@echo "💨 Taking Everything Down"
-	docker-compose down --remove-orphans
+push:
+	bin/push.sh
 
-.PHONY: logs
-logs:
-	@echo "🔎 Viewing Logs"
-	docker-compose logs -f
+.PHONY: k8s-namespace
+k8s-namespace:
+	kubectl apply -f infra/k8s/namespace.yaml
 
-.PHONY: build
-build:
-	@echo "🦾 Build Prod"
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
+.PHONY: k8s-deploy
+k8s-deploy: k8s-namespace
+	kubectl apply -f infra/k8s/deployment.yaml
+	kubectl apply -f infra/k8s/ingress.yaml
 
-.PHONY: prod
-prod:
-	@echo "🥳 Spinning Up Version For Prod"
-	docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+.PHONY: k8s-delete
+k8s-delete:
+	-kubectl delete -f infra/k8s/ingress.yaml
+	-kubectl delete -f infra/k8s/deployment.yaml
 
-.PHONY: deploy
-deploy:
-	@echo "🚀 Deploying 🚀"
-	./.deploy/deploy.sh
+.PHONY: k8s-status
+k8s-status:
+	kubectl get all -n $(NS)

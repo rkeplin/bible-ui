@@ -15,6 +15,7 @@ import Logout from './user/Logout';
 import ManageLists from './list/ManageLists';
 import ListContent from './list/ListContent';
 import UserService from './user/UserService';
+import DarkModeToggle from './DarkModeToggle';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEdit, faList, faMinusCircle } from '@fortawesome/free-solid-svg-icons';
 import { withRouter, RouteComponentProps } from './withRouter';
@@ -37,6 +38,7 @@ interface IState {
     tmpIsNavOpen: boolean;
     search: ISearch;
     loggedIn: boolean;
+    darkMode: boolean;
 }
 
 class App extends React.Component<RouteComponentProps, IState> {
@@ -46,6 +48,29 @@ class App extends React.Component<RouteComponentProps, IState> {
 
     protected userService: UserService;
 
+    private static readThemeCookie(): boolean {
+        const value = `; ${document.cookie}`;
+        const parts = value.split('; theme=');
+        if (parts.length === 2) {
+            return parts.pop()!.split(';').shift() === 'dark';
+        }
+        return false;
+    }
+
+    private static writeThemeCookie(dark: boolean): void {
+        const expires = new Date();
+        expires.setFullYear(expires.getFullYear() + 1);
+        document.cookie = `theme=${dark ? 'dark' : 'light'};expires=${expires.toUTCString()};path=/`;
+    }
+
+    private static applyTheme(dark: boolean): void {
+        if (dark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
     constructor(props: RouteComponentProps) {
         super(props);
 
@@ -54,6 +79,8 @@ class App extends React.Component<RouteComponentProps, IState> {
         this.userService = new UserService();
 
         const parser = new URLParser(this.props.location.pathname, this.props.location.search);
+        const darkMode = App.readThemeCookie();
+        App.applyTheme(darkMode);
 
         this.state = {
             title: 'Loading',
@@ -77,6 +104,7 @@ class App extends React.Component<RouteComponentProps, IState> {
             isNavOpen: true,
             tmpIsNavOpen: true,
             loggedIn: false,
+            darkMode,
         };
     }
 
@@ -181,6 +209,13 @@ class App extends React.Component<RouteComponentProps, IState> {
             isNavOpen: !this.state.isNavOpen,
             tmpIsNavOpen: !this.state.isNavOpen,
         });
+    }
+
+    protected toggleDarkMode() {
+        const darkMode = !this.state.darkMode;
+        App.applyTheme(darkMode);
+        App.writeThemeCookie(darkMode);
+        this.setState({ darkMode });
     }
 
     protected onChangeTranslation(translation: ITranslation) {
@@ -333,6 +368,10 @@ class App extends React.Component<RouteComponentProps, IState> {
                         </h2>
                     </div>
                     <div className="pull-right translation-widget">
+                        <DarkModeToggle
+                            darkMode={this.state.darkMode}
+                            onToggle={() => this.toggleDarkMode()}
+                        />
                         <TranslationSelector
                             selectedTranslation={this.state.translation}
                             onChange={(translation: ITranslation) => this.onChangeTranslation(translation)}

@@ -24,7 +24,7 @@ interface IState {
 class SearchResults extends React.Component<IProps, IState> {
     protected offset: number;
     protected limit: number;
-    protected searchChart: SearchChart;
+    protected searchChart!: SearchChart;
 
     constructor(props: IProps) {
         super(props);

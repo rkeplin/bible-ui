@@ -94,11 +94,11 @@ class BookService extends HttpService {
                     return verse;
                 }
 
-                verse.book = response[0].book;
-                verse.id = response[0].id;
-                verse.verse = response[0].verse;
-                verse.verseId = response[0].verseId;
-                verse.translation = response[0].translation;
+                verse.book = response.data[0].book;
+                verse.id = response.data[0].id;
+                verse.verse = response.data[0].verse;
+                verse.verseId = response.data[0].verseId;
+                verse.translation = response.data[0].translation;
 
                 return verse;
             });

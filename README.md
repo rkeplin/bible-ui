@@ -1,5 +1,5 @@
-[![ESLint](https://github.com/rkeplin/bible-ui/actions/workflows/lint.yml/badge.svg)](https://github.com/rkeplin/bible-ui/actions/workflows/lint.yml)
-[![TypeScript](https://github.com/rkeplin/bible-ui/actions/workflows/typecheck.yml/badge.svg)](https://github.com/rkeplin/bible-ui/actions/workflows/typecheck.yml)
+[![ESLint](https://github.com/rkeplin/bible-ui/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/rkeplin/bible-ui/actions/workflows/lint.yml)
+[![TypeScript](https://github.com/rkeplin/bible-ui/actions/workflows/typecheck.yml/badge.svg?branch=main)](https://github.com/rkeplin/bible-ui/actions/workflows/typecheck.yml)
 
 # bible-ui
 

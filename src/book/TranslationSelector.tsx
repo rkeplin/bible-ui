@@ -59,7 +59,7 @@ class TranslationSelector extends React.Component<IProps, IState> {
         this.props.onChange(selectedTranslation);
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <div style={{ display: 'inline-block' }}>
                 <button

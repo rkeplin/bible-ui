@@ -17,7 +17,7 @@ class UserMenu extends React.Component<IProps, never> {
         this.props.history.push('/user/login');
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <div style={{ display: 'inline-block' }}>
                 <div style={{ display: this.props.loggedIn ? 'none' : 'inline-block' }}>

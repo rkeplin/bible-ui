@@ -292,7 +292,7 @@ class BookSelector extends React.Component<IProps, IState> {
         this.emit(this.state.selectedBook, newChapter, 1);
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         const oldTestBooks = this.state.books
             .filter((book: IBook) => book.testament === 'OT')
             .map((book: IBook) => (

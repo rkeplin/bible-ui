@@ -19,7 +19,7 @@ class Logout extends React.Component<RouteComponentProps, never> {
         });
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <div className="row">
                 <div className="col-lg-12">Logging out, please wait...</div>

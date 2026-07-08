@@ -13,7 +13,7 @@ class UserService extends HttpService {
         super(Config.USER_API);
     }
 
-    public async login(email: string, password: string): Promise<any> {
+    public async login(email: string, password: string): Promise<AxiosResponse> {
         return this.httpClient
             .post(
                 'authenticate',

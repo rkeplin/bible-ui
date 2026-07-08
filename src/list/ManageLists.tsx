@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter, RouteComponentProps } from '../withRouter';
-import UserService, { IUser } from '../user/UserService';
+import UserService from '../user/UserService';
 import ListService, { IList } from './ListService';
 import FormError, { IFormError } from '../core/FormError';
 import { AxiosError } from 'axios';
@@ -123,7 +123,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
     public componentDidMount() {
         this.userService
             .me()
-            .then((_user: IUser) => {
+            .then(() => {
                 this.load();
             })
             .catch(() => {
@@ -246,7 +246,7 @@ class ManageLists extends React.Component<RouteComponentProps, IState> {
             });
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <div className="row">
                 <div className="col-lg-12">

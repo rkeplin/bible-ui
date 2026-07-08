@@ -9,7 +9,7 @@ interface IProp {
 export type IFormError = IProp;
 
 class FormError extends React.Component<IProp, never> {
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <div className="alert alert-danger" style={{ display: this.props.hasError ? 'block' : 'none' }}>
                 <p className={this.props.errors.length == 0 ? 'mb-0' : ''}>

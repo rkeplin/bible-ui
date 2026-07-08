@@ -24,7 +24,7 @@ interface IState {
 class SearchResults extends React.Component<IProps, IState> {
     protected offset: number;
     protected limit: number;
-    protected searchChart: any;
+    protected searchChart: SearchChart;
 
     constructor(props: IProps) {
         super(props);
@@ -151,7 +151,7 @@ class SearchResults extends React.Component<IProps, IState> {
         this.loadAggregate();
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         let loadMoreBtn;
         let oldTestBadge;
         let newTestBadge;

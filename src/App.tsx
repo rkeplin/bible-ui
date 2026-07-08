@@ -335,7 +335,7 @@ class App extends React.Component<RouteComponentProps, IState> {
         });
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <div>
                 <div id="topnav" className={`${this.state.isNavOpen ? 'nav-open' : ''}`}>
@@ -368,10 +368,7 @@ class App extends React.Component<RouteComponentProps, IState> {
                         </h2>
                     </div>
                     <div className="pull-right translation-widget">
-                        <DarkModeToggle
-                            darkMode={this.state.darkMode}
-                            onToggle={() => this.toggleDarkMode()}
-                        />
+                        <DarkModeToggle darkMode={this.state.darkMode} onToggle={() => this.toggleDarkMode()} />
                         <TranslationSelector
                             selectedTranslation={this.state.translation}
                             onChange={(translation: ITranslation) => this.onChangeTranslation(translation)}

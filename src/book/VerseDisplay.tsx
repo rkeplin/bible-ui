@@ -25,7 +25,7 @@ class VerseDisplay extends React.Component<IProps, IState> {
         this.props.onDisplayCrossRefs(this.props.verse);
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <p key={this.props.verse.verseId} className={`${this.props.verse.highlight ? 'lightyellow' : ''}`}>
                 <a

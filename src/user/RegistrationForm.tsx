@@ -74,7 +74,7 @@ class RegistrationForm extends React.Component<RouteComponentProps, IState> {
         this.props.history.push('/user/login');
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         const errors = this.state.errors.map((error: string, index: number) => <li key={index}>{error}</li>);
 
         return (

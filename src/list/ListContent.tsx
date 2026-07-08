@@ -270,7 +270,7 @@ class ListContent extends React.Component<RouteComponentProps, IState> {
         });
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <div>
                 <div className="card">

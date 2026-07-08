@@ -56,7 +56,7 @@ class KeywordSearch extends React.Component<IProps, IState> {
         });
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <div className="search-widget">
                 <div className="row">

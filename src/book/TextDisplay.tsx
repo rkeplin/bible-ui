@@ -116,7 +116,7 @@ class TextDisplay extends React.Component<IProps, IState> {
         this.props.toggleCrossRefModal(this.state.selectedVerse, open);
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <div>
                 <div className="row">

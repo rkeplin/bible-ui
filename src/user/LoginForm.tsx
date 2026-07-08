@@ -81,7 +81,7 @@ class LoginForm extends React.Component<IProps, IState> {
         this.props.history.push('/user/register');
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         const errors = this.state.errors.map((error: string, index: number) => <li key={index}>{error}</li>);
 
         return (

@@ -129,7 +129,7 @@ class CrossReference extends React.Component<IProps, IState> {
         }
     }
 
-    public render(): JSX.Element {
+    public render(): React.ReactElement {
         return (
             <div id="crossReferenceModal" style={this.state.style}>
                 <p>
